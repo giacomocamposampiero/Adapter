@@ -258,30 +258,16 @@ public class HashSetTest {
      */
     @Test
     public void testRetainAll() {
-        Collection clctn = null;
-        HashSet instance = new HashSet();
-        boolean expResult = false;
-        boolean result = instance.retainAll(clctn);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of removeAll method, of class HashSet.
-     */
-    @Test
-    public void testRemoveAll() {
         HashSet<String> instance = new HashSet<>();
         HashSet<String> list = new HashSet<>();
         list.add("pippo");
-        boolean result = instance.removeAll(list);
+        boolean result = instance.retainAll(list);
         assertEquals("metodo invocato su lista vuota", false, result);
         list.clear();
-        result = instance.removeAll(list);
+        result = instance.retainAll(list);
         assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
         instance.add("pippo");
-        result = instance.removeAll(list);
+        result = instance.retainAll(list);
         assertEquals("non trattiene nessun elemento", true, result);
         instance.add("pippo");
         list.add("pippo");
@@ -301,6 +287,14 @@ public class HashSetTest {
                     Collection<String> param = (Collection<String>) new Object();
                     instance.containsAll(param);
                 });  
+    }
+
+    /**
+     * Test of removeAll method, of class HashSet.
+     */
+    @Test
+    public void testRemoveAll() {
+        
     }
 
     /**
