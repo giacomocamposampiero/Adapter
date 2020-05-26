@@ -209,31 +209,29 @@ public class HashSetTest {
 
     /**
      * Test of addAll method, of class HashSet.
-     * Depends on the correcteness of the methods clear(), containAll(), add(), remove(), 
+     * Depends on the correcteness of the methods clear(), containAll(), add(), remove(), size(), isEmpty()
      */
     @Test
     public void testAddAll() {
         HashSet<String> list = new HashSet<>();
         HashSet<String> instance = new HashSet<>();
-        boolean result = instance.addAll(list);
+        boolean result = instance.addAll(list) && instance.isEmpty();
         assertEquals("aggiunta una collezione vuota, che non modifica lo stato del set", false, result);
         instance.add("pippo");
         list.add("pippo");
-        result = instance.addAll(list);
+        result = instance.addAll(list) && instance.size()==1;
         assertEquals("aggiunta di una collezione con elementi già presenti", false, result);
         list.add("pluto");
-        result = instance.addAll(list);
+        result = instance.addAll(list) && instance.size()==2;
         assertEquals("aggiunta di una collezione con nuovi elementi e elementi già presenti", true, result);
         list.clear();
         list.add("topolino");
-        result = instance.addAll(list);
+        result = instance.addAll(list) && instance.size()==3;
         assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
         list.add("pippo");
         list.add("pluto");
         result = instance.containsAll(list);
         assertEquals("controllo che siano stati effettivamente inseriti gli elementi", true, result);
-        int dimRis = instance.size();
-        assertEquals("controllo sulla dimensione della lista", 3, dimRis);
        
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class, 
@@ -249,12 +247,13 @@ public class HashSetTest {
                 () -> {
                     Collection<String> param = (Collection<String>) new Object();
                     instance.containsAll(param);
-                    //implementare
+                    //TODO
                 });    
     }
 
     /**
      * Test of retainAll method, of class HashSet.
+     * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
      */
     @Test
     public void testRetainAll() {
@@ -267,14 +266,14 @@ public class HashSetTest {
         result = instance.retainAll(list);
         assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
         instance.add("pippo");
-        result = instance.retainAll(list);
+        result = instance.retainAll(list) && instance.isEmpty();
         assertEquals("non trattiene nessun elemento", true, result);
         instance.add("pippo");
         list.add("pippo");
-        result = instance.retainAll(list);
+        result = instance.retainAll(list) && instance.size()==1;
         assertEquals("trattiene tutti gli elementi della lista", false, result);
         instance.add("pluto");
-        result = instance.retainAll(list);
+        result = instance.retainAll(list) && instance.size()==1;
         assertEquals("trattiene una parte degli elementi della lista", true, result);
         
         //controllo eccezioni
@@ -294,18 +293,51 @@ public class HashSetTest {
      */
     @Test
     public void testRemoveAll() {
+        HashSet<String> instance = new HashSet<>();
+        HashSet<String> list = new HashSet<>();
+        list.add("pippo");
+        boolean result = instance.removeAll(list);
+        assertEquals("metodo invocato su lista vuota", false, result);
+        list.clear();
+        result = instance.removeAll(list);
+        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
+        instance.add("pippo");
+        result = instance.removeAll(list) && instance.size()==1;
+        assertEquals("non rimuove alcun elemento del set", false, result);
+        list.add("pippo");
+        result = instance.retainAll(list) && instance.isEmpty();
+        assertEquals("rimuove tutti gli elementi del set", true, result);
+        instance.add("pluto");
+        instance.add("pippo");
+        result = instance.retainAll(list) && instance.size()==1;
+        assertEquals("rimuove una parte degli elementi della lista", true, result);
         
+        //controllo eccezioni
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class, 
+                () -> {
+                    instance.containsAll(null);
+                });
+        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class, 
+                () -> {
+                    Collection<String> param = (Collection<String>) new Object();
+                    instance.containsAll(param);
+                });     
     }
 
     /**
      * Test of clear method, of class HashSet.
+     * Depends on the correcteness of method add()
      */
     @Test
     public void testClear() {
-        HashSet instance = new HashSet();
+        HashSet<String> instance = new HashSet<>();
         instance.clear();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        boolean result = instance.isEmpty();
+        assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
+        instance.add("pippo");
+        instance.add("pluto");
+        result = instance.isEmpty();
+        assertEquals("pulizia di una lista piena, controllo che la dimensione sia nulla", true, result);
     }
     
     /**
@@ -313,12 +345,8 @@ public class HashSetTest {
      */
     @Test
     public void testIterator() {
-        HashSet instance = new HashSet();
-        Iterator expResult = null;
+        HashSet<String> instance = new HashSet<>();
         Iterator result = instance.iterator();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -344,19 +372,6 @@ public class HashSetTest {
         Object[] expResult = null;
         Object[] result = instance.toArray(ts);
         assertArrayEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of spliterator method, of class HashSet.
-     */
-    @Test
-    public void testSpliterator() {
-        HashSet instance = new HashSet();
-        Spliterator expResult = null;
-        Spliterator result = instance.spliterator();
-        assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
