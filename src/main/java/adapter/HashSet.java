@@ -3,6 +3,7 @@ package adapter;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
 
@@ -146,10 +147,31 @@ public class HashSet<E> implements Set<E> {
     public void clear() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-        
-    //*************************    
-    //MANCANO EQUALS E HASHCODE
-    //*************************
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 43 * hash + Objects.hashCode(this.struct);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final HashSet<?> other = (HashSet<?>) obj;
+        if (!Objects.equals(this.struct, other.struct)) {
+            return false;
+        }
+        return true;
+    }
     
     /**
      * Unsupported method

@@ -3,6 +3,7 @@ package tester;
 import adapter.HashSet;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -342,11 +343,56 @@ public class HashSetTest {
     
     /**
      * Test of iterator method, of class HashSet.
+     * Depends on the correcteness of method add()
      */
     @Test
     public void testIterator() {
         HashSet<String> instance = new HashSet<>();
-        Iterator result = instance.iterator();
+        Iterator<String> it = instance.iterator();
+        boolean result = it.hasNext();
+        assertEquals("iteratore di una collezione vuota non deve avere un next", false, result);
+        instance.add("pippo");
+        it = instance.iterator();
+        result = it.hasNext();
+        assertEquals("iteratore di una collezione piena deve avere un next", true, result);
+        result = it.next().equals("pippo");
+        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello nella lista", true, result);
+        result = it.hasNext();
+        assertEquals("iteratore al termine della collezione, non deve avere next", false, result);
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        it = instance.iterator();
+        result = true;
+        int i = 0;
+        while(it.hasNext()) {
+            result = result && instance.contains(it.next());
+            i++;
+        }
+        result = result && instance.size()==i;
+        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", false, result);
+        
+        //controllo eccezioni
+        assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class, 
+                () -> {
+                    instance.clear();
+                    instance.iterator().next();
+                });
+        assertThrows("remove invocato prima di next", ClassCastException.class, 
+                () -> {
+                    instance.clear();
+                    instance.add("pippo");
+                    instance.iterator().remove();
+                });  
+        assertThrows("remove invocato due volte sullo stesso elemento", ClassCastException.class, 
+                () -> {
+                    instance.clear();
+                    instance.add("pippo");
+                    Iterator<String> iter = instance.iterator();
+                    iter.next();
+                    iter.remove();
+                    iter.remove();
+                });  
     }
 
     /**
@@ -374,6 +420,22 @@ public class HashSetTest {
         assertArrayEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+    
+    /**
+     * Test of equals method, of class HashSet.
+     */
+    @Test
+    public void testEquals() {
+        
+    }
+    
+    /**
+     * Test of hashCode method, of class HashSet.
+     */
+    @Test
+    public void testHashCode() {
+        
     }
     
 }
