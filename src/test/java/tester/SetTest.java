@@ -1,35 +1,34 @@
 package tester;
 
-import adapter.HashSet;
-import java.util.Collection;
-import java.util.Iterator;
+import adapters.Set;
+import interfaces.HCollection;
+import interfaces.HIterator;
 import java.util.NoSuchElementException;
-import java.util.Spliterator;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class HashSetTest {
+public class SetTest {
         
-    public HashSetTest() { }
+    public SetTest() { }
     
     /**
-     * Test of size method, of class HashSet.
+     * Test of size method, of class Set.
      */
     @Test
     public void testSize() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         int result = instance.size();
-        assertEquals("la dimensione di un HashSet appena creato deve essere 0", 0, result);
+        assertEquals("la dimensione di un Set appena creato deve essere 0", 0, result);
     }
     
     /**
-     * Test of isEmpty method, of class HashSet.
+     * Test of isEmpty method, of class Set.
      */
     @Test
     public void testIsEmpty() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         boolean result = instance.isEmpty();
-        assertEquals("un HashSet appena creato deve essere vuoto", false, result);
+        assertEquals("un Set appena creato deve essere vuoto", false, result);
     }
     
     /**
@@ -37,18 +36,18 @@ public class HashSetTest {
      */
     @Test
     public void testIsEmptySize() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         boolean size = (instance.size() == 0);
         boolean isEmpty = instance.isEmpty();
         assertEquals("i metodi size() e isEmpty() devono essere coerenti", size, isEmpty);
     }
     
     /**
-     * Test of add method, of class HashSet.
+     * Test of add method, of class Set.
      */
     @Test
     public void testAdd() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         String elem = "pippo";
         
         boolean result = instance.add(elem);
@@ -80,11 +79,11 @@ public class HashSetTest {
     }
     
     /**
-     * Test of remove method, of class HashSet.
+     * Test of remove method, of class Set.
      */
     @Test
     public void testRemove() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         boolean result = instance.remove("pippo");
         assertEquals("rimozione di un elemento in una collezione vuota", false, result);
         
@@ -106,7 +105,7 @@ public class HashSetTest {
      */
     @Test
     public void testRemoveAdd() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         String elem = "pippo";
         instance.add(elem);
         boolean result = instance.remove(elem);
@@ -124,7 +123,7 @@ public class HashSetTest {
      */
     @Test
     public void testAddRemoveSizeEmpty() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         instance.add("pippo");
         instance.add("pluto");
         assertEquals("controllo validità metodo size()", 2, instance.size());
@@ -136,12 +135,12 @@ public class HashSetTest {
     }
 
     /**
-     * Test of contains method, of class HashSet.
+     * Test of contains method, of class Set.
      * Depends on the correctness of the methods add() and remove()
      */
     @Test
     public void testContains() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         String elem = "pippo";
         boolean result = instance.contains(elem);
         assertEquals("metodo invocato su una collezione vuota", false, result);
@@ -167,13 +166,13 @@ public class HashSetTest {
     }
     
     /**
-     * Test of containsAll method, of class HashSet.
+     * Test of containsAll method, of class Set.
      * Depends on the correctness of the methods add() and remove()
      */
     @Test
     public void testContainsAll() {
-        HashSet<String> instance = new HashSet<>();
-        HashSet<String> list = new HashSet<>();
+        Set instance = new Set();
+        Set list = new Set();
         boolean result = instance.containsAll(list);
         assertEquals("metodo invocato su una collezione vuota", false, result);
         String elem1 = "pippo", elem2 = "pluto", elem3 = "topolino";
@@ -203,19 +202,19 @@ public class HashSetTest {
                 });
         assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class, 
                 () -> {
-                    Collection<String> param = (Collection<String>) new Object();
+                    HCollection param = (HCollection) new Object();
                     instance.containsAll(param);
                 });
     }
 
     /**
-     * Test of addAll method, of class HashSet.
+     * Test of addAll method, of class Set.
      * Depends on the correcteness of the methods clear(), containAll(), add(), remove(), size(), isEmpty()
      */
     @Test
     public void testAddAll() {
-        HashSet<String> list = new HashSet<>();
-        HashSet<String> instance = new HashSet<>();
+        Set list = new Set();
+        Set instance = new Set();
         boolean result = instance.addAll(list) && instance.isEmpty();
         assertEquals("aggiunta una collezione vuota, che non modifica lo stato del set", false, result);
         instance.add("pippo");
@@ -241,25 +240,25 @@ public class HashSetTest {
                 });
         assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class, 
                 () -> {
-                    Collection<String> param = (Collection<String>) new Object();
+                    HCollection param = (HCollection) new Object();
                     instance.containsAll(param);
                 });  
         assertThrows("si fornisce come parametro non valido", IllegalArgumentException.class, 
                 () -> {
-                    Collection<String> param = (Collection<String>) new Object();
+                    HCollection param = (HCollection) new Object();
                     instance.containsAll(param);
                     //TODO
                 });    
     }
 
     /**
-     * Test of retainAll method, of class HashSet.
+     * Test of retainAll method, of class Set.
      * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
      */
     @Test
     public void testRetainAll() {
-        HashSet<String> instance = new HashSet<>();
-        HashSet<String> list = new HashSet<>();
+        Set instance = new Set();
+        Set list = new Set();
         list.add("pippo");
         boolean result = instance.retainAll(list);
         assertEquals("metodo invocato su lista vuota", false, result);
@@ -284,18 +283,18 @@ public class HashSetTest {
                 });
         assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class, 
                 () -> {
-                    Collection<String> param = (Collection<String>) new Object();
+                    HCollection param = (HCollection) new Object();
                     instance.containsAll(param);
                 });  
     }
 
     /**
-     * Test of removeAll method, of class HashSet.
+     * Test of removeAll method, of class Set.
      */
     @Test
     public void testRemoveAll() {
-        HashSet<String> instance = new HashSet<>();
-        HashSet<String> list = new HashSet<>();
+        Set instance = new Set();
+        Set list = new Set();
         list.add("pippo");
         boolean result = instance.removeAll(list);
         assertEquals("metodo invocato su lista vuota", false, result);
@@ -320,18 +319,18 @@ public class HashSetTest {
                 });
         assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class, 
                 () -> {
-                    Collection<String> param = (Collection<String>) new Object();
+                    HCollection param = (HCollection) new Object();
                     instance.containsAll(param);
                 });     
     }
 
     /**
-     * Test of clear method, of class HashSet.
+     * Test of clear method, of class Set.
      * Depends on the correcteness of method add()
      */
     @Test
     public void testClear() {
-        HashSet<String> instance = new HashSet<>();
+        Set instance = new Set();
         instance.clear();
         boolean result = instance.isEmpty();
         assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
@@ -342,13 +341,13 @@ public class HashSetTest {
     }
     
     /**
-     * Test of iterator method, of class HashSet.
+     * Test of iterator method, of class Set.
      * Depends on the correcteness of method add()
      */
     @Test
     public void testIterator() {
-        HashSet<String> instance = new HashSet<>();
-        Iterator<String> it = instance.iterator();
+        Set instance = new Set();
+        HIterator it = instance.iterator();
         boolean result = it.hasNext();
         assertEquals("iteratore di una collezione vuota non deve avere un next", false, result);
         instance.add("pippo");
@@ -388,7 +387,7 @@ public class HashSetTest {
                 () -> {
                     instance.clear();
                     instance.add("pippo");
-                    Iterator<String> iter = instance.iterator();
+                    HIterator iter = instance.iterator();
                     iter.next();
                     iter.remove();
                     iter.remove();
@@ -396,11 +395,11 @@ public class HashSetTest {
     }
 
     /**
-     * Test of toArray method, of class HashSet.
+     * Test of toArray method, of class Set.
      */
     @Test
     public void testToArray_0args() {
-        HashSet instance = new HashSet();
+        Set instance = new Set();
         Object[] expResult = null;
         Object[] result = instance.toArray();
         assertArrayEquals(expResult, result);
@@ -409,12 +408,12 @@ public class HashSetTest {
     }
 
     /**
-     * Test of toArray method, of class HashSet.
+     * Test of toArray method, of class Set.
      */
     @Test
     public void testToArray_GenericType() {
         Object[] ts = null;
-        HashSet instance = new HashSet();
+        Set instance = new Set();
         Object[] expResult = null;
         Object[] result = instance.toArray(ts);
         assertArrayEquals(expResult, result);
@@ -423,7 +422,7 @@ public class HashSetTest {
     }
     
     /**
-     * Test of equals method, of class HashSet.
+     * Test of equals method, of class Set.
      */
     @Test
     public void testEquals() {
@@ -431,7 +430,7 @@ public class HashSetTest {
     }
     
     /**
-     * Test of hashCode method, of class HashSet.
+     * Test of hashCode method, of class Set.
      */
     @Test
     public void testHashCode() {
