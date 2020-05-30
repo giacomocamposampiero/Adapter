@@ -371,6 +371,8 @@ public class SetTest {
         result = result && instance.size()==i;
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", false, result);
         
+        //TODO
+        
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class, 
                 () -> {
@@ -399,26 +401,7 @@ public class SetTest {
      */
     @Test
     public void testToArray_0args() {
-        Set instance = new Set();
-        Object[] expResult = null;
-        Object[] result = instance.toArray();
-        assertArrayEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of toArray method, of class Set.
-     */
-    @Test
-    public void testToArray_GenericType() {
-        Object[] ts = null;
-        Set instance = new Set();
-        Object[] expResult = null;
-        Object[] result = instance.toArray(ts);
-        assertArrayEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //TODO
     }
     
     /**
@@ -426,7 +409,14 @@ public class SetTest {
      */
     @Test
     public void testEquals() {
-        
+        Set instance = new Set();
+        instance.add("pippo");
+        Set instance2 = new Set();
+        boolean result = instance.equals(instance2);
+        assertEquals("confronto di due set diversi", false, result);
+        instance2.add("pippo");
+        result = instance.equals(instance2);
+        assertEquals("confronto di due set diversi", true, result);
     }
     
     /**
@@ -434,7 +424,31 @@ public class SetTest {
      */
     @Test
     public void testHashCode() {
-        
+        Set instance = new Set();
+        int result = instance.hashCode();
+        assertEquals("per definizione, l'hashcode di un set vuoto deve essere 0", 0, result);
+        String elem = "pippo";
+        instance.add(elem);
+        result = instance.hashCode();
+        assertEquals("per definizione, l'hashcode di un set con un elemento deve essere uguale all'hashcode dell'elemento", elem.hashCode(), result);
+        String elem2 = "pluto";
+        instance.add(elem2);
+        result = instance.hashCode();
+        assertEquals("per definizione, l'hashcode di un set con un elemento deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode()+elem2.hashCode(), result);
+    }
+    
+    /**
+     * Test the coherence of methods hashCode() and equals().
+     */
+    @Test
+    public void testHashEquals() {
+        Set instance = new Set();
+        instance.add("pippo");
+        int hash = instance.hashCode();
+        Set instance2 = new Set();
+        instance2.add("pippo");
+        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
+        assertEquals("confronto di due set diversi", true, result);
     }
     
 }
