@@ -6,7 +6,7 @@ import interfaces.HList;
 import interfaces.HListIterator;
 
 /**
- *
+ * Implementation of List interface Java 1.4.2.
  * @author Giacomo Camposampiero
  */
 public class List implements HList  {

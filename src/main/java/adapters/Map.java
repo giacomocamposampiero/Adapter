@@ -5,7 +5,7 @@ import interfaces.HMap;
 import interfaces.HSet;
 
 /**
- *
+ * Implementation of Map interface Java 1.4.2.
  * @author Giacomo Camposampiero
  */
 public class Map implements HMap {
