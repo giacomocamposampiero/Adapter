@@ -1,7 +1,7 @@
 package interfaces;
 
 /**
- *
+ * Iterator interface Java 1.4.2.
  * @author Giacomo Camposampiero
  */
 public interface HIterator {

@@ -9,7 +9,7 @@ public interface HCollection {
     /**
      * Appends the specified element to the end of this list (optional operation).
      * @param o  element to be appended to this list. 
-     * @return      true (as per the general contract of the Collection.add method). 
+     * @return true (as per the general contract of the Collection.add method). 
      */
     boolean add(Object o);
 
@@ -56,13 +56,13 @@ public interface HCollection {
 
     /**
      * Returns true if this list contains no elements.
-     * @return      true if this list contains no elements.
+     * @return  true if this list contains no elements.
      */
     boolean isEmpty(); 
 
     /**
      * Returns an iterator over the elements in this list in proper sequence.
-     * @return      an iterator over the elements in this list in proper sequence.
+     * @return  an iterator over the elements in this list in proper sequence.
      */
     HIterator iterator();
 
