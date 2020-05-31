@@ -1,5 +1,6 @@
 package tester;
 
+import adapters.List;
 import adapters.Set;
 import interfaces.HCollection;
 import interfaces.HIterator;
@@ -68,17 +69,8 @@ public class SetTest {
                 () -> {
                     instance.add(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
-                () -> {
-                    String param = (String) new Object();
-                    instance.add(param);
-                });
-        assertThrows("si fornisce come parametro un oggetto del tipo sbagliato", IllegalArgumentException.class,
-                () -> {
-                    //check
-                    String param = (String) new Object();
-                    instance.add(param);
-                });
+        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
+        //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
@@ -95,11 +87,8 @@ public class SetTest {
                 () -> {
                     instance.remove(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
-                () -> {
-                    String param = (String) new Object();
-                    instance.remove(param);
-                });
+        //ClassCastException non può essere lanciata per definizione
+        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
@@ -158,11 +147,7 @@ public class SetTest {
                 () -> {
                     instance.contains(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
-                () -> {
-                    String param = (String) new Object();
-                    instance.contains(param);
-                });
+        //ClassCastException non può essere controllata per definizione
     }
 
     /**
@@ -199,11 +184,15 @@ public class SetTest {
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
+        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
                 () -> {
-                    HCollection param = (HCollection) new Object();
+                    List param = new List();
+                    list.add("pippo");
+                    list.add("pluto");
+                    list.add(null);
                     instance.containsAll(param);
                 });
+        //ClassCastException non può essere lanciata per definizione
     }
 
     /**
@@ -236,17 +225,17 @@ public class SetTest {
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
+        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
                 () -> {
-                    HCollection param = (HCollection) new Object();
-                    instance.containsAll(param);
+                    List param = new List();
+                    list.add("pippo");
+                    list.add("pluto");
+                    list.add(null);
+                    instance.addAll(param);
                 });
-        assertThrows("si fornisce come parametro non valido", IllegalArgumentException.class,
-                () -> {
-                    HCollection param = (HCollection) new Object();
-                    instance.containsAll(param);
-                    //TODO
-                });
+        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
+        //ClassCastException non può essere lanciata per definizione
+        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
@@ -276,13 +265,19 @@ public class SetTest {
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
-                    instance.containsAll(null);
+                    instance.retainAll(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
+        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
                 () -> {
-                    HCollection param = (HCollection) new Object();
-                    instance.containsAll(param);
+                    List param = new List();
+                    list.add("pippo");
+                    list.add("pluto");
+                    list.add(null);
+                    instance.retainAll(param);
                 });
+        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
+        //ClassCastException non può essere lanciata per definizione
+        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
@@ -308,16 +303,22 @@ public class SetTest {
         result = instance.retainAll(list) && instance.size() == 1;
         assertEquals("rimuove una parte degli elementi della lista", true, result);
 
-        //controllo eccezioni
+       //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si fornisce come parametro un oggetto che genera un errore di cast", ClassCastException.class,
+        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
                 () -> {
-                    HCollection param = (HCollection) new Object();
-                    instance.containsAll(param);
+                    List param = new List();
+                    list.add("pippo");
+                    list.add("pluto");
+                    list.add(null);
+                    instance.addAll(param);
                 });
+        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
+        //ClassCastException non può essere lanciata per definizione
+        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
@@ -445,6 +446,17 @@ public class SetTest {
         instance2.add("pippo");
         boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
         assertEquals("confronto di due set diversi", true, result);
+    }
+    
+    /**
+     * Test the throwing of UnsupportedOperationException exception.
+     */
+    @Test
+    public void testToArray_1args() {
+        assertThrows("invocato metodo toArray parametrico", UnsupportedOperationException.class,
+                () -> {
+                    instance.toArray(new Object[1]);
+                });
     }
 
 }
