@@ -2,7 +2,6 @@ package tester;
 
 import adapters.List;
 import adapters.Set;
-import interfaces.HCollection;
 import interfaces.HIterator;
 import java.util.NoSuchElementException;
 import org.junit.Test;
@@ -36,7 +35,7 @@ public class SetTest {
     @Test
     public void testIsEmpty() {
         boolean result = instance.isEmpty();
-        assertEquals("un Set appena creato deve essere vuoto", false, result);
+        assertEquals("un Set appena creato deve essere vuoto", true, result);
     }
 
     /**
@@ -151,14 +150,14 @@ public class SetTest {
     }
 
     /**
-     * Test of containsAll method, of class Set. Depends on the correctness of
-     * the methods add() and remove()
+     * Test of containsAll method, of class Set. 
+     * Depends on the correctness of methods add() and remove()
      */
     @Test
     public void testContainsAll() {
         Set list = new Set();
         boolean result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione vuota", false, result);
+        assertEquals("metodo invocato su una collezione vuota", true, result);
         String elem1 = "pippo", elem2 = "pluto", elem3 = "topolino";
         list.add(elem1);
         list.add(elem2);
@@ -267,14 +266,7 @@ public class SetTest {
                 () -> {
                     instance.retainAll(null);
                 });
-        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
-                () -> {
-                    List param = new List();
-                    list.add("pippo");
-                    list.add("pluto");
-                    list.add(null);
-                    instance.retainAll(param);
-                });
+        //NullPointerException non viene lanciata se la collezione contiene un elemento null, non crea problemi
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
@@ -296,11 +288,11 @@ public class SetTest {
         result = instance.removeAll(list) && instance.size() == 1;
         assertEquals("non rimuove alcun elemento del set", false, result);
         list.add("pippo");
-        result = instance.retainAll(list) && instance.isEmpty();
+        result = instance.removeAll(list) && instance.isEmpty();
         assertEquals("rimuove tutti gli elementi del set", true, result);
         instance.add("pluto");
         instance.add("pippo");
-        result = instance.retainAll(list) && instance.size() == 1;
+        result = instance.removeAll(list) && instance.size() == 1;
         assertEquals("rimuove una parte degli elementi della lista", true, result);
 
        //controllo eccezioni
@@ -332,6 +324,7 @@ public class SetTest {
         assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
         instance.add("pippo");
         instance.add("pluto");
+        instance.clear();
         result = instance.isEmpty();
         assertEquals("pulizia di una lista piena, controllo che la dimensione sia nulla", true, result);
     }
@@ -364,7 +357,7 @@ public class SetTest {
             i++;
         }
         result = result && instance.size() == i;
-        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", false, result);
+        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
 
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
@@ -372,13 +365,13 @@ public class SetTest {
                     instance.clear();
                     instance.iterator().next();
                 });
-        assertThrows("remove invocato prima di next", ClassCastException.class,
+        assertThrows("remove invocato prima di next", IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");
                     instance.iterator().remove();
                 });
-        assertThrows("remove invocato due volte sullo stesso elemento", ClassCastException.class,
+        assertThrows("remove invocato due volte sullo stesso elemento", IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");
@@ -400,12 +393,13 @@ public class SetTest {
         instance.add("pippo");
         instance.add("pluto");
         result = instance.toArray();
-        expected = new Object[]{"pippo", "pluto"};
+        expected = new Object[]{"pluto", "pippo"};
         assertArrayEquals("toArrray invocato su un set pieno", expected, result);        
     }
 
     /**
      * Test of equals method, of class Set.
+     * Depends on the correctness of method add()
      */
     @Test
     public void testEquals() {
@@ -416,10 +410,13 @@ public class SetTest {
         instance2.add("pippo");
         result = instance.equals(instance2);
         assertEquals("confronto di due set diversi", true, result);
+        result = instance2.equals(instance);
+        assertEquals("il confronto deve essere simmetrico", true, result);
     }
 
     /**
      * Test of hashCode method, of class Set.
+     * Depends on the correctness of method add()
      */
     @Test
     public void testHashCode() {
@@ -437,6 +434,7 @@ public class SetTest {
 
     /**
      * Test the coherence of methods hashCode() and equals().
+     * Depends on the correctness of method add()
      */
     @Test
     public void testHashEquals() {
