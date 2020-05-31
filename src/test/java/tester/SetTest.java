@@ -1,6 +1,5 @@
 package tester;
 
-import adapters.List;
 import adapters.Set;
 import interfaces.HIterator;
 import java.util.NoSuchElementException;
@@ -8,6 +7,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 
+/**
+ * Test suite for Set class
+ * @author Giacomo Camposampiero
+ */
 public class SetTest {
 
     private Set instance;
@@ -183,14 +186,7 @@ public class SetTest {
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
-                () -> {
-                    List param = new List();
-                    list.add("pippo");
-                    list.add("pluto");
-                    list.add(null);
-                    instance.containsAll(param);
-                });
+        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //ClassCastException non può essere lanciata per definizione
     }
 
@@ -201,7 +197,7 @@ public class SetTest {
     @Test
     public void testAddAll() {
         Set list = new Set();
-        boolean result = instance.addAll(list) && instance.isEmpty();
+        boolean result = instance.addAll(list) || !instance.isEmpty();
         assertEquals("aggiunta una collezione vuota, che non modifica lo stato del set", false, result);
         instance.add("pippo");
         list.add("pippo");
@@ -224,14 +220,7 @@ public class SetTest {
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
-                () -> {
-                    List param = new List();
-                    list.add("pippo");
-                    list.add("pluto");
-                    list.add(null);
-                    instance.addAll(param);
-                });
+        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
@@ -300,33 +289,26 @@ public class SetTest {
                 () -> {
                     instance.containsAll(null);
                 });
-        assertThrows("si usa come parametro una collezione che contiene un riferimento a null", NullPointerException.class,
-                () -> {
-                    List param = new List();
-                    list.add("pippo");
-                    list.add("pluto");
-                    list.add(null);
-                    instance.addAll(param);
-                });
+        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
-     * Test of clear method, of class Set. Depends on the correcteness of method
-     * add()
+     * Test of clear method, of class Set. 
+     * Depends on the correcteness of methot add()
      */
     @Test
     public void testClear() {
         instance.clear();
         boolean result = instance.isEmpty();
-        assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
+        assertEquals("pulizia di un insieme vuoto, controllo che la dimensione sia nulla", true, result);
         instance.add("pippo");
         instance.add("pluto");
         instance.clear();
         result = instance.isEmpty();
-        assertEquals("pulizia di una lista piena, controllo che la dimensione sia nulla", true, result);
+        assertEquals("pulizia di un insieme pieno, controllo che la dimensione sia nulla", true, result);
     }
 
     /**
@@ -358,7 +340,9 @@ public class SetTest {
         }
         result = result && instance.size() == i;
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
-
+        
+        //TODOS remove
+        
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
                 () -> {
@@ -409,7 +393,7 @@ public class SetTest {
         assertEquals("confronto di due set diversi", false, result);
         instance2.add("pippo");
         result = instance.equals(instance2);
-        assertEquals("confronto di due set diversi", true, result);
+        assertEquals("confronto di due set uguali", true, result);
         result = instance2.equals(instance);
         assertEquals("il confronto deve essere simmetrico", true, result);
     }
@@ -429,7 +413,7 @@ public class SetTest {
         String elem2 = "pluto";
         instance.add(elem2);
         result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di un set con un elemento deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
+        assertEquals("per definizione, l'hashcode di un set con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
     }
 
     /**
