@@ -7,71 +7,71 @@ import interfaces.HIterator;
  * Implementation of Collection interface Java 1.4.2.
  * @author Giacomo Camposampiero
  */
-public class Collection implements HCollection {
+public class Collection extends List implements HCollection {
 
     @Override
     public boolean add(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.add(o);
     }
 
     @Override
     public boolean addAll(HCollection c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.addAll(c);
     }
     
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        super.clear();
     }
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.contains(o);
     }
 
     @Override
     public boolean containsAll(HCollection c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.containsAll(c);
     }
 
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.isEmpty();
     }
 
     @Override
     public HIterator iterator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.iterator();
     }
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.remove(o);
     }
 
     @Override
     public boolean removeAll(HCollection c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.removeAll(c);
     }
 
     @Override
     public boolean retainAll(HCollection c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.retainAll(c);
     }
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.size();
     }
     
     @Override
     public Object[] toArray() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.toArray();
     }
 
     @Override
     public Object[] toArray(Object[] a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return super.toArray(a);
     }
     
 }

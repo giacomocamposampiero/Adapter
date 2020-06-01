@@ -1,70 +1,32 @@
 package tester;
 
-import adapters.List;
+import adapters.Collection;
 import interfaces.HIterator;
-import interfaces.HList;
-import interfaces.HListIterator;
 import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- *
+ * Test suite for Collection class
  * @author Giacomo Camposampiero
  */
-public class ListTest {
-
-    private List instance;
-
-    public ListTest() {
+public class CollectionTest {
+    
+    Collection instance;
+    
+    public CollectionTest() {
     }
-
+    
+    
     @Before
     public void setUp() {
-        instance = new List();
+        instance = new Collection();
     }    
 
     /**
-     * Test of add method, of class List. 
-     * Depends also on the correctness of methods get() and size()
-     */
-    @Test
-    public void testAdd_int_Object() {
-        instance.add(0, "pippo");
-        boolean result = instance.size() == 1;
-        assertEquals("inserimento di un oggetto in una lista vuota", true, result);
-        String elem = "pluto";
-        instance.add(0, elem);
-        result = instance.get(0).equals(elem) && instance.size() == 2;
-        assertEquals("inserisco in testa ad una lista piena", true, result);
-        instance.add(2, "topolino");
-        result = instance.get(2).equals("topolino") && instance.size() == 3;
-        assertEquals("inserisco in coda ad una lista piena", true, result);
-        instance.add(1, "pippo");
-        result = instance.get(1).equals(elem) && instance.size() == 4;
-        assertEquals("inserisco in mezzo ad una lista piena, con duplicato", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.add(null);
-                });
-        assertThrows("si specifica una posizione > size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.add(100000, "pippo");
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.add(-20, "pippo");
-                });
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
-
-    /**
-     * Test of add method, of class List.
+     * Test of add method, of class Collection.
+     * Depends also on the correctness of method contains()
      */
     @Test
     public void testAdd_Object() {
@@ -72,9 +34,9 @@ public class ListTest {
         boolean result = instance.add(elem);
         assertEquals("primo elemento che inserisco", true, result);
         result = instance.add(elem);
-        assertEquals("inserisco per la seconda volta lo stesso elemento, la lista ammette duplicati", true, result);
-        result = instance.add("pluto") && instance.get(2).equals("pluto");
-        assertEquals("inserisco una seconda stringa, verifico che sia inserita alla fine della lista", true, result);
+        assertEquals("inserisco per la seconda volta lo stesso elemento, la collezione ammette duplicati", true, result);
+        result = instance.add("pluto") && instance.contains("pluto");
+        assertEquals("inserisco una seconda stringa", true, result);
 
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
@@ -87,14 +49,14 @@ public class ListTest {
     }
 
     /**
-     * Test of addAll method, of class List.
+     * Test of addAll method, of class Collection.
      * Depends also on the correctness of methods add(), size(), clear() and get()
      */
     @Test
     public void testAddAll_HCollection() {
-        List list = new List();
+        Collection list = new Collection();
         boolean result = instance.addAll(list) || !instance.isEmpty();
-        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della lista", false, result);
+        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della collezione", false, result);
         instance.add("pippo");
         list.add("pippo");
         result = instance.addAll(list) && instance.size() == 2;
@@ -106,18 +68,16 @@ public class ListTest {
         list.add("topolino");
         result = instance.addAll(list) && instance.size() == 5;
         assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
-        result = instance.get(0).equals("pippo") && instance.get(1).equals("pippo") && instance.get(2).equals("pippo") && instance.get(3).equals("pluto") && instance.get(4).equals("topolino");
-        assertEquals("controllo che gli elementi siano effettivamente stati inseriti in fondo alla lista e che siano tutti presenti", true, result);
         list.add("pippo");
         list.add("pluto");
         result = instance.addAll(list) && (instance.size()==8);
         HIterator itInst = instance.iterator();
-        HIterator itList = list.iterator();
+        HIterator itCollection = list.iterator();
         int i = 0;
         while(itInst.hasNext()) {
             Object o = itInst.next();
-            if(i>4 && itList.hasNext()) {
-                result = result && o.equals(itList.next());
+            if(i>4 && itCollection.hasNext()) {
+                result = result && o.equals(itCollection.next());
             }
             i++;
         }
@@ -127,54 +87,6 @@ public class ListTest {
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
                     instance.containsAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
-
-    /**
-     * Test of addAll method, of class List.
-     * Depends also on the correctness of methods add(), clear(), iterator() and size()
-     */
-    @Test
-    public void testAddAll_int_HCollection() {
-        List list = new List();
-        boolean result = instance.addAll(list) || !instance.isEmpty();
-        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della lista", false, result);
-        list.add("pippo");
-        list.add("pluto");
-        result = instance.addAll(0, list) && (instance.size()==2);
-        assertEquals("aggiunta di una collezione piena, che modifica lo stato della lista", true, result);
-        list.clear();
-        list.add("topolino");
-        list.add("paperino");
-        result = instance.addAll(1, list) && (instance.size()==3);
-        HIterator itInst = instance.iterator();
-        HIterator itList = list.iterator();
-        int i = 0;
-        while(itInst.hasNext()) {
-            Object o = itInst.next();
-            if(i>0 && itList.hasNext()) {
-                result = result && o.equals(itList.next());
-            }
-            i++;
-        }
-        assertEquals("aggiunta di una collezione piena nel mezzo, controllo che gli elementi della collezione sianio aggiunti nell'ordine in cui sono restituiti dall'iteratore", true, result);
-        
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.addAll(null);
-                });
-        assertThrows("si specifica una posizione >> size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.addAll(100000, list);
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.addAll(-20, list);
                 });
         //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
@@ -199,23 +111,23 @@ public class ListTest {
     }
     
     /**
-     * Test of clear method, of class List.
+     * Test of clear method, of class Collection.
      * Depends also on the correctness of methods add(), clear() and isEmpty()
      */
     @Test
     public void testClear() {
         instance.clear();
         boolean result = instance.isEmpty();
-        assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
+        assertEquals("pulizia di una collezione vuota, controllo che la dimensione sia nulla", true, result);
         instance.add("pippo");
         instance.add("pluto");
         instance.clear();
         result = instance.isEmpty();
-        assertEquals("pulizia di una lista piena, controllo che la dimensione sia nulla", true, result);
+        assertEquals("pulizia di una collezione piena, controllo che la dimensione sia nulla", true, result);
     }
 
     /**
-     * Test of contains method, of class List.
+     * Test of contains method, of class Collection.
      * Depends also on the correctness of methods add() and remove()
      */
     @Test
@@ -241,11 +153,11 @@ public class ListTest {
     }
 
     /**
-     * Test of containsAll method, of class List.
+     * Test of containsAll method, of class Collection.
      */
     @Test
     public void testContainsAll() {
-        List list = new List();
+        Collection list = new Collection();
         boolean result = instance.containsAll(list);
         assertEquals("metodo invocato su una collezione vuota", true, result);
         String elem1 = "pippo", elem2 = "pluto", elem3 = "topolino";
@@ -284,7 +196,7 @@ public class ListTest {
     @Test
     public void testEquals() {
         instance.add("pippo");
-        List instance2 = new List();
+        Collection instance2 = new Collection();
         boolean result = instance.equals(instance2);
         assertEquals("confronto di due list diverse", false, result);
         instance2.add("pippo");
@@ -292,33 +204,6 @@ public class ListTest {
         assertEquals("confronto di due list uguali", true, result);
         result = instance2.equals(instance);
         assertEquals("il confronto deve essere simmetrico", true, result);
-    }
-
-    /**
-     * Test of get method, of class List.
-     * Depends also on the correctness of method add()
-     */
-    @Test
-    public void testGet() {
-        String elem = "pippo";
-        String elem2 = "pluto";
-        instance.add(0, elem);
-        boolean result = elem.equals(instance.get(0));
-        assertEquals("metodo invocato su una lista con un solo elemento", true, result);
-        instance.add(1, elem2);
-        instance.add(2, "paperino");
-        result = elem2.equals(instance.get(1));
-        assertEquals("metodo invocato su una lista con più elementi", true, result);
-        
-        //controllo eccezioni
-        assertThrows("si specifica una posizione >= size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.get(instance.size());
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.get(-20);
-                });
     }
         
     /**
@@ -336,7 +221,7 @@ public class ListTest {
         String elem2 = "pluto";
         instance.add(elem2);
         result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una lista con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
+        assertEquals("per definizione, l'hashcode di una collezione con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
     }
 
     /**
@@ -347,37 +232,10 @@ public class ListTest {
     public void testHashEquals() {
         instance.add("pippo");
         int hash = instance.hashCode();
-        List instance2 = new List();
+        Collection instance2 = new Collection();
         instance2.add("pippo");
         boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
-        assertEquals("confronto di due list diverse", true, result);
-    }
-
-    /**
-     * Test of indexOf method, of class List.
-     * Depends also on the correctness of method add()
-     */
-    @Test
-    public void testIndexOf() {
-        String elem = "pippo";
-        int result = instance.indexOf(elem);
-        assertEquals("metodo invocato su lista vuota", -1, result);
-        instance.add("pluto");
-        result = instance.indexOf(elem);
-        assertEquals("metodo invocato su lista popolata, elemento non presente", -1, result);
-        instance.add("pippo");
-        result = instance.indexOf(elem);
-        assertEquals("metodo invocato su lista popolata dove l'elemento è presente, viene testato anche l'utilizzo del metodo equals degli oggetti per fare confronti", 1, result);
-        instance.add("pippo");
-        result = instance.indexOf(elem);
-        assertEquals("controllo che nel caso di occorrenze multiple il metodo restituisca l'indice minore tra quelli degli elementi uguali", 1, result);
-        
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.indexOf(null);
-                });
-        //ClassCastException non può essere lanciata per definizione
+        assertEquals("confronto di due set diversi", true, result);
     }
     
     /**
@@ -400,7 +258,7 @@ public class ListTest {
     }
 
     /**
-     * Test of iterator method, of class List.
+     * Test of iterator method, of class Collection.
      */
     @Test
     public void testIterator() {
@@ -412,7 +270,7 @@ public class ListTest {
         result = it.hasNext();
         assertEquals("iteratore di una collezione piena deve avere un next", true, result);
         result = it.next().equals("pippo");
-        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello nella lista", true, result);
+        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello nella collezione", true, result);
         result = it.hasNext();
         assertEquals("iteratore al termine della collezione, non deve avere next", false, result);
         instance.add("pippo");
@@ -426,7 +284,7 @@ public class ListTest {
             i++;
         }
         result = result && instance.size() == i;
-        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
+        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella collezione", true, result);
         
         //TODOS remove
         fail("The test case is a prototype.");
@@ -455,75 +313,7 @@ public class ListTest {
     }
 
     /**
-     * Test of lastIndexOf method, of class List.
-     * Depends also on the correctness of method add()
-     */
-    @Test
-    public void testLastIndexOf() {
-        String elem = "pippo";
-        int result = instance.lastIndexOf(elem);
-        assertEquals("metodo invocato su lista vuota", -1, result);
-        instance.add("pluto");
-        result = instance.lastIndexOf(elem);
-        assertEquals("metodo invocato su lista popolata, elemento non presente", -1, result);
-        instance.add("pippo");
-        result = instance.lastIndexOf(elem);
-        assertEquals("metodo invocato su lista popolata dove l'elemento è presente, viene testato anche l'utilizzo del metodo equals degli oggetti per fare confronti", 1, result);
-        instance.add("pippo");
-        result = instance.lastIndexOf(elem);
-        assertEquals("controllo che nel caso di occorrenze multiple il metodo restituisca l'indice maggiore tra quelli degli elementi uguali", 2, result);
-        
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.lastIndexOf(null);
-                });
-        //ClassCastException non può essere lanciata per definizione
-    }
-
-    /**
-     * Test of listIterator method, of class List.
-     */
-    @Test
-    public void testListIterator_0args() {
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of listIterator method, of class List.
-     */
-    @Test
-    public void testListIterator_int() {
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of remove method, of class List.
-     * Depends also on the correctness of methods add(), get() and size()
-     */
-    @Test
-    public void testRemove_int() {
-        instance.add("pippo");
-        instance.add("pluto");
-        instance.add("topolino");
-        Object result = instance.remove(0);
-        assertEquals("l'elemento è stato rimosso dalla lista", 2, instance.size());
-        boolean check = result.equals("pippo") && instance.get(0).equals("pluto") && instance.get(1).equals("topolino");
-        assertEquals("gli elementi a destra di quello rimosso sono stati scalati di uno e l'oggetto restituito è effettivamente quello cancellato", true, check);
-        
-        //controllo eccezioni
-        assertThrows("si specifica una posizione >= size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.remove(instance.size());
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.remove(-20);
-                });
-    }
-
-    /**
-     * Test of remove method, of class List.
+     * Test of remove method, of class Collection.
      * Depends also on add(), clear(), get() methods
      */
     @Test
@@ -543,7 +333,7 @@ public class ListTest {
         instance.add("pippo");
         instance.add("pluto");
         instance.add("pippo");
-        result = instance.remove("pippo") && instance.get(0).equals("pluto") && instance.get(1).equals("pippo");
+        result = instance.remove("pippo") && instance.contains("pluto") && instance.contains("pippo");
         assertEquals("verifica che, in caso di duplicati, si rimuova l'istanza con indice minore", true, result);
         
         //controllo eccezioni
@@ -556,18 +346,18 @@ public class ListTest {
     }
 
     /**
-     * Test of removeAll method, of class List.
+     * Test of removeAll method, of class Collection.
      * Depends also on the correctness of methods add(), size() and isEmpty()
      */
     @Test
     public void testRemoveAll() {
-        List list = new List();
+        Collection list = new Collection();
         list.add("pippo");
         boolean result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
+        assertEquals("metodo invocato su collezione vuota", false, result);
         list.clear();
         result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
+        assertEquals("metodo invocato su collezione vuota con parametro vuoto", false, result);
         instance.add("pippo");
         result = instance.removeAll(list) && instance.size() == 1;
         assertEquals("non rimuove alcun elemento del set", false, result);
@@ -577,7 +367,7 @@ public class ListTest {
         instance.add("pluto");
         instance.add("pippo");
         result = instance.removeAll(list) && instance.size() == 1;
-        assertEquals("rimuove una parte degli elementi della lista", true, result);
+        assertEquals("rimuove una parte degli elementi della collezione", true, result);
 
        //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
@@ -591,28 +381,28 @@ public class ListTest {
     }
 
     /**
-     * Test of retainAll method, of class List.
+     * Test of retainAll method, of class Collection.
      * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
      */
     @Test
     public void testRetainAll() {
-        List list = new List();
+        Collection list = new Collection();
         list.add("pippo");
         boolean result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
+        assertEquals("metodo invocato su collezione vuota", false, result);
         list.clear();
         result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
+        assertEquals("metodo invocato su collezione vuota con parametro vuoto", false, result);
         instance.add("pippo");
         result = instance.retainAll(list) && instance.isEmpty();
         assertEquals("non trattiene nessun elemento", true, result);
         instance.add("pippo");
         list.add("pippo");
         result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene tutti gli elementi della lista", false, result);
+        assertEquals("trattiene tutti gli elementi della collezione", false, result);
         instance.add("pluto");
         result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene una parte degli elementi della lista", true, result);
+        assertEquals("trattiene una parte degli elementi della collezione", true, result);
 
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
@@ -624,38 +414,6 @@ public class ListTest {
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
-
-    /**
-     * Test of set method, of class List.
-     * Depends also on the correctness of methods add() and get()
-     */
-    @Test
-    public void testSet() {
-        instance.add("pippo");
-        instance.add("pluto");
-        instance.add("topolino");
-        Object[] arr = instance.toArray();
-        Object result = instance.set(0, "pluto");
-        assertEquals("controllo che l'oggetto restituito dal metodo corrisponda a quello che è stato sostituito ", true, result.equals("pippo"));
-        assertEquals("controllo che l'oggetto all'indice specificato sia stato effettivamente sostituito", true, instance.get(0).equals("pluto"));
-        boolean check = true;
-        for(int i=1; i<arr.length; i++) check = check && arr[i].equals(instance.get(i));
-        assertEquals("controllo che il resto della lista non sia stato alterato dalla modifica", true, check);
-        
-        //controllo eccezioni
-        assertThrows("parametro element null", NullPointerException.class,
-                () -> {
-                    instance.set(0, null);
-                });
-        assertThrows("si specifica una posizione >= size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.set(-1, "pippo");
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.set(instance.size(), "pippo");
-                });
-    }
     
     /**
      * Test of size method, of class Set.
@@ -663,20 +421,11 @@ public class ListTest {
     @Test
     public void testSize() {
         int result = instance.size();
-        assertEquals("la dimensione di una lista appena creata deve essere 0", 0, result);
+        assertEquals("la dimensione di una collezione appena creata deve essere 0", 0, result);
     }
 
     /**
-     * Test of subList method, of class List.
-     */
-    @Test
-    public void testSubList() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of toArray method, of class List.
+     * Test of toArray method, of class Collection.
      * Depends also on the correctness of methods add(), contains() and iterator()
      */
     @Test
@@ -705,5 +454,5 @@ public class ListTest {
                     instance.toArray(new Object[1]);
                 });
     }
-
+    
 }

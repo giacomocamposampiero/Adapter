@@ -4,6 +4,8 @@ import interfaces.HCollection;
 import interfaces.HIterator;
 import interfaces.HList;
 import interfaces.HListIterator;
+import java.util.Enumeration;
+import java.util.Vector;
 
 /**
  * Implementation of List interface Java 1.4.2.
@@ -11,14 +13,24 @@ import interfaces.HListIterator;
  */
 public class List implements HList  {
 
+    private Vector vec;
+    
+    public List() {
+        vec = new Vector();
+    }
+    
     @Override
     public void add(int index, Object element) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(element == null) throw new NullPointerException();
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
+        vec.insertElementAt(element, index);
     }
 
     @Override
     public boolean add(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(o == null) throw new NullPointerException();
+        vec.add(o);
+        return true;
     }
 
     @Override
@@ -28,67 +40,100 @@ public class List implements HList  {
 
     @Override
     public boolean addAll(int index, HCollection c) {
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        vec.removeAllElements();
     }
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(o == null) throw new NullPointerException();
+        return vec.contains(o);
     }
 
     @Override
     public boolean containsAll(HCollection c) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    @Override 
+    public boolean equals(Object o) {
+         if (o == this) return true; 
+        if (!(o.getClass().equals(this.getClass()))) { 
+            return false; 
+        }    
+        Set other = (Set) o;
+        if (other.size() != size()) return false;
+        for (Enumeration elems = vec.elements() ; elems.hasMoreElements() ;) {
+            if(!other.contains(elems.nextElement())) return false;
+        }
+        return true;
+    }
+    
+    @Override 
+    public int hashCode() {
+        int hash = 0;
+        for (Enumeration elems = vec.elements() ; elems.hasMoreElements() ;) {
+            hash += elems.nextElement().hashCode();
+        }
+        return hash;
+    }
 
     @Override
     public Object get(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
+        return vec.elementAt(index);
     }
 
     @Override
     public int indexOf(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(o == null) throw new NullPointerException();
+        return vec.indexOf(o);
     }
 
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return vec.isEmpty();
     }
 
     @Override
     public HIterator iterator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new ListIterator(0);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(o == null) throw new NullPointerException();
+        return vec.lastIndexOf(o);
     }
 
     @Override
     public HListIterator listIterator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new ListIterator(0);
     }
 
     @Override
     public HListIterator listIterator(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
+        return new ListIterator(index);
     }
 
     @Override
     public Object remove(int index) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
+        Object old = get(index);
+        vec.removeElementAt(index);
+        return old;
     }
 
     @Override
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(o == null) throw new NullPointerException();
+        return vec.remove(o);
     }
 
     @Override
@@ -103,12 +148,16 @@ public class List implements HList  {
 
     @Override
     public Object set(int index, Object element) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(element == null) throw new NullPointerException();
+        if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
+        Object old = get(index);
+        vec.setElementAt(element, index);
+        return old;
     }
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return vec.size();
     }
 
     @Override
@@ -124,6 +173,59 @@ public class List implements HList  {
     @Override
     public Object[] toArray(Object[] a) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    class ListIterator implements HListIterator {
+        
+        public ListIterator(int index) {
+            
+        }
+        
+        @Override
+        public void add(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public int nextIndex() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Object previous() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public int previousIndex() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void set(Object o) {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public boolean hasNext() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public Object next() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+        
     }
     
 }
