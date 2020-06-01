@@ -377,8 +377,9 @@ public class SetTest {
         instance.add("pippo");
         instance.add("pluto");
         result = instance.toArray();
-        expected = new Object[]{"pluto", "pippo"};
-        assertArrayEquals("toArrray invocato su un set pieno", expected, result);        
+        boolean check = (result.length == instance.size());
+        for(int i=0; i<result.length; i++) check = check && instance.contains(result[i]);   
+        assertEquals("toArrray invocato su un set pieno", true, check);        
     }
 
     /**

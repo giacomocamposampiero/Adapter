@@ -2,15 +2,23 @@ package interfaces;
 
 /**
  * List interface Java 1.4.2.
+ * An ordered collection (also known as a sequence). The user of this interface has precise control over where in the list each element is inserted. The user can access elements by their integer index (position in the list), and search for elements in the list.
+ * Unlike Set, List allows duplicate elements. More formally, List allows pairs of elements e1 and e2 such that e1.equals(e2).
+ * Null elements are not considered as valid elements of the list. An attempt of insertion of a null element will result in an unchecked exception, NullPointerException. The same behaviour is expected as result of any operation on Set elements with a null reference.
  * @author Giacomo Camposampiero
  */
 public interface HList extends HCollection {
 
     /**
-     * Inserts all of the elements in the specified collection into this list at the specified position (optional operation).
+     * Inserts all of the elements in the specified collection into this list at the specified position.
+     * Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices).
+     * The new elements will appear in this list in the order that they are returned by the specified collection's iterator.
+     * The behavior of this operation is unspecified if the specified collection is modified while the operation is in progress.
      * @param index  index at which to insert first element from the specified collection.
-     * @param c  elements to be inserted into this list. 
+     * @param c  elements to be inserted into this list.    
      * @return  true if this list changed as a result of the call. 
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+     * @throws NullPointerException if the element parameter is null
      */
     boolean addAll(int index, HCollection c);
     
@@ -46,7 +54,7 @@ public interface HList extends HCollection {
 
     /**
      * Returns a list iterator of the elements in this list (in proper sequence).
-     * @return      a list iterator of the elements in this list (in proper sequence).
+     * @return a list iterator of the elements in this list (in proper sequence).
      */
     HListIterator listIterator();
 
@@ -72,9 +80,12 @@ public interface HList extends HCollection {
     Object get(int index);
     
     /**
-     * Inserts the specified element at the specified position in this list (optional operation).
-     * @param index  index at which the specified element is to be inserted.
-     * @param element  element to be inserted. 
+     * Inserts the specified element at the specified position in this list.
+     * Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices). 
+     * @param index index at which the specified element is to be inserted.
+     * @param element element to be inserted. 
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+     * @throws NullPointerException if the element parameter is null
      */
     void add(int index, Object element);
     

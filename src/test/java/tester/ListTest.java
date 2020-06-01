@@ -26,8 +26,8 @@ public class ListTest {
     }    
 
     /**
-     * Test of add method, of class List. Depends on the correctness of methods
-     * get() and size()
+     * Test of add method, of class List. 
+     * Depends also on the correctness of methods get() and size()
      */
     @Test
     public void testAdd_int_Object() {
@@ -88,7 +88,7 @@ public class ListTest {
 
     /**
      * Test of addAll method, of class List.
-     * Depends on the correctness of methods add(), size() clear() 
+     * Depends also on the correctness of methods add(), size(), clear() and get()
      */
     @Test
     public void testAddAll_HCollection() {
@@ -122,15 +122,45 @@ public class ListTest {
 
     /**
      * Test of addAll method, of class List.
+     * Depends also on the correctness of methods add(), clear(), iterator() and size()
      */
     @Test
     public void testAddAll_int_HCollection() {
-        
+        List list = new List();
+        boolean result = instance.addAll(list) || !instance.isEmpty();
+        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della lista", false, result);
+        list.add("pippo");
+        list.add("pluto");
+        result = instance.addAll(0, list) && (instance.size()==2);
+        assertEquals("aggiunta di una collezione piena, che modifica lo stato della lista", true, result);
+        list.clear();
+        list.add("topolino");
+        list.add("paperino");
+        result = instance.addAll(1, list) && (instance.size()==3);
+        HIterator itInst = list.iterator();
+        HIterator itList = instance.iterator();
+        int i = 0;
+        while(itInst.hasNext()) {
+            Object o = itInst.next();
+            if(i>0 && itList.hasNext()) {
+                result = result && o.equals(itList.next());
+            }
+            i++;
+        }
+        assertEquals("aggiunta di una collezione piena nel mezzo, controllo che gli elementi della collezione sianio aggiunti nell'ordine in cui sono restituiti dall'iteratore", true, result);
         
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
-                    instance.containsAll(null);
+                    instance.addAll(null);
+                });
+        assertThrows("si specifica una posizione > size()", IndexOutOfBoundsException.class,
+                () -> {
+                    instance.addAll(100000, list);
+                });
+        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
+                () -> {
+                    instance.addAll(-20, list);
                 });
         //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
@@ -139,8 +169,41 @@ public class ListTest {
     }
 
     /**
+     * Test of remove method, used after the invocation of the method add().
+     * Depends on the correctness of the method add()
+     */
+    @Test
+    public void testRemoveAdd() {
+        String elem = "pippo";
+        instance.add(elem);
+        boolean result = instance.remove(elem);
+        assertEquals("rimozione di un elemento presente", true, result);
+        result = instance.remove(elem);
+        assertEquals("rimozione di un elemento eliminato in precedenza", false, result);
+        instance.add(elem);
+        result = instance.remove("pippo");
+        assertEquals("verifica dell'utilizzo del metodo equals() sull'oggetto passato come parametro", true, result);
+    }
+    
+        /**
+     * Tests the behaviour of a sequence of add() and remove() invocations.
+     * Verifies also the coherence of the methods size() & isEmpty()
+     */
+    @Test
+    public void testAddRemoveSizeEmpty() {
+        instance.add("pippo");
+        instance.add("pluto");
+        assertEquals("controllo validità metodo size()", 2, instance.size());
+        assertEquals("controllo validità metodo isEmpty()", false, instance.isEmpty());
+        instance.remove("pippo");
+        instance.remove("pluto");
+        assertEquals("controllo validità metodo size()", 0, instance.size());
+        assertEquals("controllo validità metodo isEmpty()", true, instance.isEmpty());
+    }
+    
+    /**
      * Test of clear method, of class List.
-     * Depends on the correctness of method add()
+     * Depends also on the correctness of methods add(), clear() and isEmpty()
      */
     @Test
     public void testClear() {
@@ -156,17 +219,28 @@ public class ListTest {
 
     /**
      * Test of contains method, of class List.
+     * Depends also on the correctness of methods add() and remove()
      */
     @Test
     public void testContains() {
-        System.out.println("contains");
-        Object o = null;
-        List instance = new List();
-        boolean expResult = false;
-        boolean result = instance.contains(o);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String elem = "pippo";
+        boolean result = instance.contains(elem);
+        assertEquals("metodo invocato su una collezione vuota", false, result);
+        instance.add(elem);
+        result = instance.contains(elem);
+        assertEquals("metodo invocato con un parametro valido", true, result);
+        result = instance.contains("pippo");
+        assertEquals("verifica che il metodo sia basato su equals()", true, result);
+        instance.remove(elem);
+        result = instance.contains(elem);
+        assertEquals("metodo invocato con un parametro che è stato in precedenza cancellato", false, result);
+
+        //controllo eccezioni
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.contains(null);
+                });
+        //ClassCastException non può essere controllata per definizione
     }
 
     /**
@@ -186,7 +260,7 @@ public class ListTest {
     
     /**
      * Test of equals method, of class Set.
-     * Depends on the correctness of method add()
+     * Depends also on the correctness of method add()
      */
     @Test
     public void testEquals() {
@@ -218,7 +292,7 @@ public class ListTest {
     }
         
     /**
-     * Test of hashCode method, of class Set. Depends on the correctness of
+     * Test of hashCode method, of class Set. Depends also on the correctness of
      * method add()
      */
     @Test
@@ -236,7 +310,7 @@ public class ListTest {
     }
 
     /**
-     * Test the coherence of methods hashCode() and equals(). Depends on the
+     * Test the coherence of methods hashCode() and equals(). Depends also on the
      * correctness of method add()
      */
     @Test
