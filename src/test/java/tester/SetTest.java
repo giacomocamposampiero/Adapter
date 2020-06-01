@@ -227,8 +227,8 @@ public class SetTest {
     }
 
     /**
-     * Test of retainAll method, of class Set. Depends on the correctness of
-     * methods add(), clear(), isEmpty(), remove(), size()
+     * Test of retainAll method, of class Set. 
+     * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
      */
     @Test
     public void testRetainAll() {
@@ -342,6 +342,7 @@ public class SetTest {
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
         
         //TODOS remove
+        fail("The test case is a prototype.");
         
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
@@ -368,6 +369,7 @@ public class SetTest {
 
     /**
      * Test of toArray method, of class Set.
+     * Depends also on the correctness of methods add(), contains() and iterator()
      */
     @Test
     public void testToArray_0args() {
@@ -377,9 +379,12 @@ public class SetTest {
         instance.add("pippo");
         instance.add("pluto");
         result = instance.toArray();
+        HIterator it = instance.iterator();
         boolean check = (result.length == instance.size());
-        for(int i=0; i<result.length; i++) check = check && instance.contains(result[i]);   
-        assertEquals("toArrray invocato su un set pieno", true, check);        
+        for(int i=0; i<result.length; i++) {
+            check = check && instance.contains(result[i]) && it.next().equals(result[i]);
+        }   
+        assertEquals("toArray invocato su un set pieno, controllo anche che gli elementi siano presenti nell'array nello stesso ordine nel quale sono restituiti dall'iteratore", true, check);        
     }
 
     /**

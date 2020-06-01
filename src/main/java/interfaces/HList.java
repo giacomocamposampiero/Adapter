@@ -31,9 +31,12 @@ public interface HList extends HCollection {
     HList subList(int fromIndex, int toIndex);
     
     /**
-     * Removes the element at the specified position in this list (optional operation).
-     * @param index      the index of the element to removed.   
-     * @return  the element previously at the specified position. 
+     * Removes the element at \the specified position in this list.
+     * Shifts any subsequent elements to the left (subtracts one from their indices). Returns the element that was removed from the list. 
+     * @param index the index of the element to removed.   
+     * @return the element previously at the specified position.
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+     * @throws NullPointerException if the element parameter is null
      */
     Object remove(int index);
     
@@ -76,6 +79,7 @@ public interface HList extends HCollection {
      * Returns the element at the specified position in this list.
      * @param index  index of element to return. 
      * @return  the element at the specified position in this list. 
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
      */
     Object get(int index);
     
