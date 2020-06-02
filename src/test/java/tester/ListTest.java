@@ -42,7 +42,7 @@ public class ListTest {
         result = instance.get(2).equals("topolino") && instance.size() == 3;
         assertEquals("inserisco in coda ad una lista piena", true, result);
         instance.add(1, "pippo");
-        result = instance.get(1).equals(elem) && instance.size() == 4;
+        result = instance.get(1).equals("pippo") && instance.size() == 4;
         assertEquals("inserisco in mezzo ad una lista piena, con duplicato", true, result);
 
         //controllo eccezioni
@@ -98,7 +98,7 @@ public class ListTest {
         instance.add("pippo");
         list.add("pippo");
         result = instance.addAll(list) && instance.size() == 2;
-        assertEquals("aggiunta di una collezione con elementi già presenti", false, result);
+        assertEquals("aggiunta di una collezione con elementi già presenti", true, result);
         list.add("pluto");
         result = instance.addAll(list) && instance.size() == 4;
         assertEquals("aggiunta di una collezione con nuovi elementi e elementi già presenti", true, result);
@@ -106,8 +106,6 @@ public class ListTest {
         list.add("topolino");
         result = instance.addAll(list) && instance.size() == 5;
         assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
-        result = instance.get(0).equals("pippo") && instance.get(1).equals("pippo") && instance.get(2).equals("pippo") && instance.get(3).equals("pluto") && instance.get(4).equals("topolino");
-        assertEquals("controllo che gli elementi siano effettivamente stati inseriti in fondo alla lista e che siano tutti presenti", true, result);
         list.add("pippo");
         list.add("pluto");
         result = instance.addAll(list) && (instance.size()==8);
@@ -126,7 +124,7 @@ public class ListTest {
         //controllo eccezioni
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
-                    instance.containsAll(null);
+                    instance.addAll(null);
                 });
         //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
         //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
@@ -148,19 +146,14 @@ public class ListTest {
         result = instance.addAll(0, list) && (instance.size()==2);
         assertEquals("aggiunta di una collezione piena, che modifica lo stato della lista", true, result);
         list.clear();
+        instance.clear();
         list.add("topolino");
         list.add("paperino");
-        result = instance.addAll(1, list) && (instance.size()==3);
+        result = instance.addAll(0, list) && (instance.size()==2);
         HIterator itInst = instance.iterator();
         HIterator itList = list.iterator();
-        int i = 0;
-        while(itInst.hasNext()) {
-            Object o = itInst.next();
-            if(i>0 && itList.hasNext()) {
-                result = result && o.equals(itList.next());
-            }
-            i++;
-        }
+        while(itInst.hasNext() && itList.hasNext()) 
+                result = result && itInst.next().equals(itList.next());
         assertEquals("aggiunta di una collezione piena nel mezzo, controllo che gli elementi della collezione sianio aggiunti nell'ordine in cui sono restituiti dall'iteratore", true, result);
         
         //controllo eccezioni
@@ -328,15 +321,19 @@ public class ListTest {
     @Test
     public void testHashCode() {
         int result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una list vuota deve essere 0", 0, result);
+        int expected = 1;
+        assertEquals("per definizione, l'hashcode di una list vuota deve essere 1", expected, result);
         String elem = "pippo";
         instance.add(elem);
         result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una list con un solo elemento deve essere uguale all'hashcode dell'elemento", elem.hashCode(), result);
+        expected = expected*31 + elem.hashCode();
+        assertEquals("controllo la correttezza dell'hashcode di una lista con un solo elemento sulla base dell'algoritmo dato", expected, result);
         String elem2 = "pluto";
         instance.add(elem2);
         result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una lista con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
+        expected = expected*31 + elem2.hashCode();
+        assertEquals("controllo la correttezza dell'hashcode di una lista con più elementi", expected, result);
+    
     }
 
     /**
@@ -345,12 +342,13 @@ public class ListTest {
      */
     @Test
     public void testHashEquals() {
+        List other = new List();
+        other.add("pippo");
         instance.add("pippo");
-        int hash = instance.hashCode();
-        List instance2 = new List();
-        instance2.add("pippo");
-        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
-        assertEquals("confronto di due list diverse", true, result);
+        boolean result = (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
+        instance.add("pluto");
+        result = result || (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
+        assertEquals("l'hashcode è coerente con il metodo equals", false, result);
     }
 
     /**
@@ -428,22 +426,28 @@ public class ListTest {
         result = result && instance.size() == i;
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
         
-        //TODOS remove
-        fail("The test case is a prototype.");
-        
+        instance.clear();
+        instance.add("pippo");
+        instance.add("pluto");
+        it = instance.iterator();
+        Object o = it.next();
+        it.remove();
+        result = (instance.size() == 1) && !instance.contains(o);
+        assertEquals("il metodo remove rimuove correttamente l'oggetto appena restituito dal next", true, result);
+                
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
                 () -> {
                     instance.clear();
                     instance.iterator().next();
                 });
-        assertThrows("remove invocato prima di next", IllegalStateException.class,
+        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");
                     instance.iterator().remove();
                 });
-        assertThrows("remove invocato due volte sullo stesso elemento", IllegalStateException.class,
+        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");

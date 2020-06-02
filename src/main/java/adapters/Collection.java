@@ -5,6 +5,7 @@ import interfaces.HIterator;
 
 /**
  * Implementation of Collection interface Java 1.4.2.
+ *
  * @author Giacomo Camposampiero
  */
 public class Collection extends List implements HCollection {
@@ -18,7 +19,7 @@ public class Collection extends List implements HCollection {
     public boolean addAll(HCollection c) {
         return super.addAll(c);
     }
-    
+
     @Override
     public void clear() {
         super.clear();
@@ -63,7 +64,7 @@ public class Collection extends List implements HCollection {
     public int size() {
         return super.size();
     }
-    
+
     @Override
     public Object[] toArray() {
         return super.toArray();
@@ -73,5 +74,35 @@ public class Collection extends List implements HCollection {
     public Object[] toArray(Object[] a) {
         return super.toArray(a);
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o.getClass().equals(this.getClass()))) {
+            return false;
+        }
+        Collection other = (Collection) o;
+        if (other.size() != size()) {
+            return false;
+        }
+        HIterator it = iterator(), oit = other.iterator();
+        while (it.hasNext() && oit.hasNext()) {
+            if (!it.next().equals(oit.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = 0;
+        HIterator it = iterator();
+        while(it.hasNext())
+            hashCode += it.next().hashCode();
+        return hashCode;
+    }
+
 }

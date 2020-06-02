@@ -60,7 +60,7 @@ public class CollectionTest {
         instance.add("pippo");
         list.add("pippo");
         result = instance.addAll(list) && instance.size() == 2;
-        assertEquals("aggiunta di una collezione con elementi già presenti", false, result);
+        assertEquals("aggiunta di una collezione con elementi già presenti", true, result);
         list.add("pluto");
         result = instance.addAll(list) && instance.size() == 4;
         assertEquals("aggiunta di una collezione con nuovi elementi e elementi già presenti", true, result);
@@ -207,35 +207,18 @@ public class CollectionTest {
     }
         
     /**
-     * Test of hashCode method, of class Set. Depends also on the correctness of
-     * method add()
+     * Test of hashCode method, of class Set. 
+     * Depends also on the correctness of method add()
      */
     @Test
     public void testHashCode() {
-        int result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una list vuota deve essere 0", 0, result);
-        String elem = "pippo";
-        instance.add(elem);
-        result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una list con un solo elemento deve essere uguale all'hashcode dell'elemento", elem.hashCode(), result);
-        String elem2 = "pluto";
-        instance.add(elem2);
-        result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di una collezione con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
-    }
-
-    /**
-     * Test the coherence of methods hashCode() and equals(). Depends also on the
-     * correctness of method add()
-     */
-    @Test
-    public void testHashEquals() {
+        Collection other = new Collection();
+        other.add("pippo");
         instance.add("pippo");
-        int hash = instance.hashCode();
-        Collection instance2 = new Collection();
-        instance2.add("pippo");
-        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
-        assertEquals("confronto di due set diversi", true, result);
+        boolean result = (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
+        instance.add("pluto");
+        result = result || (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
+        assertEquals("l'hashcode è coerente con il metodo equals", false, result);
     }
     
     /**
@@ -286,8 +269,14 @@ public class CollectionTest {
         result = result && instance.size() == i;
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella collezione", true, result);
         
-        //TODOS remove
-        fail("The test case is a prototype.");
+        instance.clear();
+        instance.add("pippo");
+        instance.add("pluto");
+        it = instance.iterator();
+        Object o = it.next();
+        it.remove();
+        result = (instance.size() == 1) && !instance.contains(o);
+        assertEquals("il metodo remove rimuove correttamente l'oggetto appena restituito dal next", true, result);               
         
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
@@ -295,13 +284,13 @@ public class CollectionTest {
                     instance.clear();
                     instance.iterator().next();
                 });
-        assertThrows("remove invocato prima di next", IllegalStateException.class,
+        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");
                     instance.iterator().remove();
                 });
-        assertThrows("remove invocato due volte sullo stesso elemento", IllegalStateException.class,
+        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");

@@ -341,22 +341,28 @@ public class SetTest {
         result = result && instance.size() == i;
         assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
         
-        //TODOS remove
-        fail("The test case is a prototype.");
-        
+        instance.clear();
+        instance.add("pippo");
+        instance.add("pluto");
+        it = instance.iterator();
+        Object o = it.next();
+        it.remove();
+        result = (instance.size() == 1) && !instance.contains(o);
+        assertEquals("il metodo remove rimuove correttamente l'oggetto appena restituito dal next", true, result);
+                
         //controllo eccezioni
         assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
                 () -> {
                     instance.clear();
                     instance.iterator().next();
                 });
-        assertThrows("remove invocato prima di next", IllegalStateException.class,
+        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");
                     instance.iterator().remove();
                 });
-        assertThrows("remove invocato due volte sullo stesso elemento", IllegalStateException.class,
+        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
                 () -> {
                     instance.clear();
                     instance.add("pippo");

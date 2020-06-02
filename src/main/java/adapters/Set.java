@@ -3,6 +3,7 @@ package adapters;
 import interfaces.HCollection;
 import interfaces.HIterator;
 import interfaces.HSet;
+import exceptions.IllegalStateException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.NoSuchElementException;
@@ -97,7 +98,7 @@ public class Set implements HSet{
         HIterator it = iterator();
         while(it.hasNext()) {
             Object elem = it.next();
-            if(!c.contains(elem)) res = res || remove(elem);
+            if(!c.contains(elem)) res = remove(elem) || res;
         }
         return res;
     }
