@@ -7,8 +7,8 @@ import org.junit.runner.notification.Failure;
 public class TestRunner {
 
     public static void main(String[] args) {
-        /**
-        String[] test = {"HashMapTester"};
+
+        String[] test = {"MapTest", "ListTest", "SetTest"};
         for (String name : test) {
             Class clazz = null;
             try {
@@ -17,6 +17,7 @@ public class TestRunner {
                 continue;
             }
             Result result = JUnitCore.runClasses(clazz);
+            System.out.println("Now executing test: " + name);
             System.out.println(result);
             for (Failure failure : result.getFailures()) {
                 System.out.println(failure.toString());
@@ -24,7 +25,6 @@ public class TestRunner {
             System.out.println("Test successful == " + result.wasSuccessful());
             System.out.println("___________________\n\n");
         }
-        */
     }
     
 }

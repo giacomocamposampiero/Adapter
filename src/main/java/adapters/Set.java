@@ -225,9 +225,24 @@ public class Set implements HSet{
         return res;
     }
 
+    /**
+     * Returns an array containing all of the elements in this list in proper sequence.
+     * The runtime type of the returned array is that of the specified array if a parameter is big enough to contain all the elements of this list (all the elements of the list are copied inside the a parameter).
+     * If a is not big enough, a new Object[] array will be instantiated, and the return array won't be of the specified array type.
+     * The returned array will be "safe" in that no references to it are maintained by this list. (In other words, this method must allocate a new array even if this list is backed by an array). The caller is thus free to modify the returned array.
+     * If the parameter a is big enough to contain all the element of this list, the elements will be stored in the parametric array. Only the first size() cell of the array will be written, the others will mantain their actual value.
+     * @param a the array into which the elements of this list are to be stored, if it is big enough 
+     * @return an array containing the elements of this list. 
+     * @throws NullPointerException if the parameter is null
+     */
     @Override
     public Object[] toArray(Object[] a) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Object[] res = (a.length >= size()) ? a : new Object[size()];
+        int i = 0;
+        for (Enumeration elems = table.elements() ; elems.hasMoreElements(); i++) {
+            res[i] = elems.nextElement();
+        }
+        return res;
     }
     
     class SetIterator implements HIterator {

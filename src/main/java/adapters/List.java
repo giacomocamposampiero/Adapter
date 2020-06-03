@@ -25,6 +25,7 @@ public class List implements HList {
     /**
      * Inserts the specified element at the specified position in this list.
      * Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices). 
+     * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
      * @param index index at which the specified element is to be inserted.
      * @param element element to be inserted. 
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
@@ -42,7 +43,8 @@ public class List implements HList {
     }
 
     /**
-     * Returns true if this list changed as a result of the call. (Returns false if this list does not permit duplicates and already contains the specified element.). 
+     * Appends the specified element to the end of this list.
+     * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
      * @param o  element that has to be inserted. 
      * @return  true if this list changed as a result of the call  
      * @throws NullPointerException whether the parameter is a null reference, which is not considered a valid type of entry for the collection
@@ -54,10 +56,13 @@ public class List implements HList {
     }
 
     /**
-     * Adds all of the elements in the specified collection to this list. 
+     * Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's iterator.
      * The behavior of this operation is undefined if the specified collection is modified while the operation is in progress.
      * @param c  elements to be inserted into this list.
      * @return  true if this collection changed as a result of the call. 
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+     * @throws NullPointerException if the element parameter is null
+     * @throws NullPointerException if the collection contains null elementes
      */
     @Override
     public boolean addAll(HCollection c) {
@@ -74,6 +79,7 @@ public class List implements HList {
      * @return  true if this list changed as a result of the call. 
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
      * @throws NullPointerException if the element parameter is null
+     * @throws NullPointerException if the collection contains null elementes
      */
     @Override
     public boolean addAll(int index, HCollection c) {
@@ -245,8 +251,10 @@ public class List implements HList {
 
     /**
      * Returns a list iterator of the elements in this list (in proper sequence), starting at the specified position in this list.
+     * The specified index indicates the first element that would be returned by an initial call to the next method. An initial call to the previous method would return the element with the specified index minus one. 
      * @param index  index of first element to be returned from the list iterator (by a call to the next method). 
      * @return  a list iterator of the elements in this list (in proper sequence), starting at the specified position in this list. 
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()-1]
      */
     @Override
     public HListIterator listIterator(int index) {
@@ -261,8 +269,7 @@ public class List implements HList {
      * Shifts any subsequent elements to the left (subtracts one from their indices). Returns the element that was removed from the list. 
      * @param index the index of the element to removed.   
      * @return the element previously at the specified position.
-     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
-     * @throws NullPointerException if the element parameter is null
+     * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()-1]
      */
     @Override
     public Object remove(int index) {
@@ -357,9 +364,12 @@ public class List implements HList {
 
     /**
      * Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive.
+     * (If fromIndex and toIndex are equal, the returned list is empty.) The returned list is backed by this list, so non-structural changes in the returned list are reflected in this list, and vice-versa. The returned list supports all of the optional list operations supported by this list.
+     * The semantics of the list returned by this method become undefined if the backing list (i.e., this list) is structurally modified in any way other than via the returned list. (Structural modifications are those that change the size of this list, or otherwise perturb it in such a fashion that iterations in progress may yield incorrect results.) 
      * @param fromIndex  low endpoint (inclusive) of the subList.
      * @param toIndex  high endpoint (exclusive) of the subList. 
      * @return  a view of the specified range within this list. 
+     * @throws IndexOutOfBoundsException for an illegal endpoint index value (fromIndex < 0 || toIndex > size || fromIndex > toIndex).
      */
     @Override
     public HList subList(int fromIndex, int toIndex) {
@@ -368,7 +378,7 @@ public class List implements HList {
     }
 
     /**
-     * Returns an array containing all of the elements in this list.
+     * Returns an array containing all of the elements in this listin proper sequence.
      * The returned array will be "safe" in that no references to it are maintained by this list. (In other words, this method must allocate a new array even if this list is backed by an array). The caller is thus free to modify the returned array.
      * @return  an array containing all of the elements in this list.
      */
@@ -379,17 +389,27 @@ public class List implements HList {
         return res;
     }
 
+    /**
+     * Returns an array containing all of the elements in this list in proper sequence.
+     * The runtime type of the returned array is that of the specified array if a parameter is big enough to contain all the elements of this list (all the elements of the list are copied inside the a parameter).
+     * If a is not big enough, a new Object[] array will be instantiated, and the return array won't be of the specified array type.
+     * The returned array will be "safe" in that no references to it are maintained by this list. (In other words, this method must allocate a new array even if this list is backed by an array). The caller is thus free to modify the returned array.
+     * If the parameter a is big enough to contain all the element of this list, the elements will be stored in the parametric array. Only the first size() cell of the array will be written, the others will mantain their actual value.
+     * @param a the array into which the elements of this list are to be stored, if it is big enough 
+     * @return an array containing the elements of this list. 
+     * @throws NullPointerException if the parameter is null
+     */
     @Override
     public Object[] toArray(Object[] a) {
-        if(a.length >= size()) {
-                vec.copyInto(a);
-                return a;
-            }
-        Object[] arr = new Object[size()];
-        vec.copyInto(arr);
-        return arr;
+        Object[] res = (a.length >= size()) ? a : new Object[size()];
+        vec.copyInto(res);
+        return res;
     }
     
+    /**
+     * Returns a string representation of the object.
+     * @return a string representation of the object.
+     */
     @Override
     public String toString() {
         String res = "";
@@ -398,6 +418,9 @@ public class List implements HList {
         return res;
     }
 
+    /**
+     * Inner class ListIterator, implements HListIterator interface. 
+     */
     class ListIterator implements HListIterator {
         
         private int cursor;
@@ -468,6 +491,9 @@ public class List implements HList {
 
     }
     
+    /**
+     * SubList inner class.
+     */
     class SubList implements HList {
 
         private final int fromIndex;
@@ -654,183 +680,4 @@ public class List implements HList {
 
     }
     
-    /*
-    class SubList implements HList {
-        
-        private final int fromIndex;
-        private final Vector subvec;    
-
-        public SubList(int fromIndex, int toIndex) {
-            this.fromIndex = fromIndex;
-            subvec = new Vector(toIndex - fromIndex);
-            HIterator it = List.this.listIterator(fromIndex);
-            while(toIndex!=fromIndex && it.hasNext()) {
-                subvec.add(it.next());
-                toIndex--;
-            }
-        }
-
-        @Override
-        public boolean add(Object o) {
-            add(size(), o);
-            return true;
-        }
-        
-        @Override
-        public void add(int index, Object element) {
-            if(index < 0 || index >= subvec.size()) throw new IndexOutOfBoundsException();
-            if(element == null) throw new NullPointerException();
-            vec.insertElementAt(element, index);
-            List.this.add(fromIndex + index, element);
-        }
-
-        @Override
-        public boolean addAll(HCollection c) {
-            return addAll(size(), c);
-        }
-        
-        @Override
-        public boolean addAll(int index, HCollection c) {
-            if (index < 0 || index > size()) throw new IndexOutOfBoundsException();
-            HIterator it = c.iterator();
-            while (it.hasNext()) add(index++, it.next());
-            List.this.addAll(fromIndex + index, c);
-            return true;
-        }
-
-        @Override
-        public void clear() {
-            List.this.removeAll(this);
-            subvec.removeAllElements();
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            return subvec.contains(o);
-        }
-
-        @Override
-        public boolean containsAll(HCollection c) {
-            boolean res = true;
-            HIterator it = c.iterator();
-            while (it.hasNext()) res = res && contains(it.next());
-            return res;
-        }
-        
-        @Override
-        public Object get(int index) {
-            if(index < 0 || index >= subvec.size()) throw new IndexOutOfBoundsException();
-            return subvec.get(index);
-        }   
-        
-        @Override
-        public int indexOf(Object o) {
-            if(o == null) throw new NullPointerException();
-            return subvec.indexOf(o);
-        }   
-
-        @Override
-        public boolean isEmpty() {
-            return subvec.isEmpty();
-        }
-
-        @Override
-        public HIterator iterator() {
-            return new ListIterator(fromIndex, fromIndex + size());
-        }
-        
-        @Override
-        public int lastIndexOf(Object o) {
-            if(o == null) throw new NullPointerException();
-            return subvec.lastIndexOf(o);
-        }
-
-        @Override
-        public HListIterator listIterator() {
-            return new ListIterator(fromIndex, fromIndex + size());
-        }
-
-        @Override
-        public HListIterator listIterator(int index) {
-            return new ListIterator(fromIndex, fromIndex + size());
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            if(o == null) throw new NullPointerException();
-            List.this.remove(o);
-            return subvec.remove(o);
-        }
-        
-        @Override
-        public Object remove(int index) {
-            if(index < 0 || index >= subvec.size()) throw new IndexOutOfBoundsException();
-            List.this.remove(fromIndex + index);
-            Object obj = subvec.get(index);
-            subvec.remove(index);
-            return obj;
-        }
-
-        @Override
-        public boolean removeAll(HCollection c) {
-            boolean changed = false;
-            HIterator it = c.iterator();
-            while(it.hasNext())
-                changed = remove(it.next()) || changed;
-            List.this.removeAll(c);
-            return changed;
-        }
-
-        @Override
-        public boolean retainAll(HCollection c) {
-            boolean changed = false;
-            HIterator it = iterator();
-            while(it.hasNext()) {
-                Object elem = it.next();
-                if(!c.contains(elem)) changed = remove(elem) || changed;
-            }
-            List.this.retainAll(c);
-            return changed;
-        }
-        
-        @Override
-        public Object set(int index, Object element) {
-            if(index < 0 || index >= subvec.size()) throw new IndexOutOfBoundsException();
-            if(element == null) throw new NullPointerException();
-            Object res = subvec.get(index);
-            subvec.set(index, element);
-            return res;
-        }
-
-        @Override
-        public int size() {
-            return subvec.size();
-        }
-        
-        @Override
-        public HList subList(int fromIndex, int toIndex) {
-            if(fromIndex < 0 || fromIndex > toIndex || toIndex >= size()) throw new IndexOutOfBoundsException();
-            return new SubList(this.fromIndex + fromIndex, this.fromIndex + toIndex);
-        }
-
-        @Override
-        public Object[] toArray() {
-            Object[] res = new Object[size()];
-            subvec.copyInto(res);
-            return res;
-        }
-
-        @Override
-        public Object[] toArray(Object[] a) {
-            if(a.length >= size()) {
-                subvec.copyInto(a);
-                return a;
-            }
-            Object[] arr = new Object[size()];
-            subvec.copyInto(arr);
-            return arr;
-        }
-       
-    }*/
-
 }
