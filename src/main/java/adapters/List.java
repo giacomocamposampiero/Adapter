@@ -49,9 +49,13 @@ public class List implements HList {
         if (index < 0 || index > size()) {
             throw new IndexOutOfBoundsException();
         }
+        boolean res = false;
         HIterator it = c.iterator();
-        while (it.hasNext()) add(index++, it.next());
-        return true;
+        while (it.hasNext()) {
+            add(index++, it.next());
+            res = true;
+        }
+        return res;
     }
 
     @Override
@@ -331,7 +335,7 @@ public class List implements HList {
         
         @Override
         public void add(int index, Object element) {
-            if(index < 0 || index > toIndex) throw new IndexOutOfBoundsException();
+            if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
             List.this.add(fromIndex + index, element);
             toIndex++;
         }
@@ -343,7 +347,7 @@ public class List implements HList {
         
         @Override
         public boolean addAll(int index, HCollection c) {
-            if(index < 0 || index > toIndex) throw new IndexOutOfBoundsException();
+            if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
             boolean res =  List.this.addAll(fromIndex + index, c);
             toIndex += c.size();
             return res;
@@ -352,8 +356,7 @@ public class List implements HList {
         @Override
         public void clear() {
             while(fromIndex < toIndex)
-                List.this.remove(toIndex--);
-            List.this.remove(fromIndex);
+                List.this.remove(--toIndex);
         }
 
         @Override
@@ -372,7 +375,7 @@ public class List implements HList {
         
         @Override
         public Object get(int index) {
-            if(index < 0 || index > toIndex) throw new IndexOutOfBoundsException();
+            if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
             return List.this.get(fromIndex + index);
         }
         
@@ -394,7 +397,7 @@ public class List implements HList {
 
         @Override
         public HIterator iterator() {
-            return new ListIterator(fromIndex, toIndex + 1);
+            return new ListIterator(fromIndex, toIndex);
         }
         
         @Override
@@ -409,13 +412,13 @@ public class List implements HList {
 
         @Override
         public HListIterator listIterator() {
-            return new ListIterator(fromIndex, toIndex + 1);
+            return new ListIterator(fromIndex, toIndex);
         }
 
         @Override
         public HListIterator listIterator(int index) {
-            if(index < 0 || index > toIndex) throw new IndexOutOfBoundsException();
-            return new ListIterator(fromIndex + index, toIndex + 1);
+            if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
+            return new ListIterator(fromIndex + index, toIndex);
         }
 
         @Override
@@ -430,7 +433,7 @@ public class List implements HList {
         
         @Override
         public Object remove(int index) {
-            if(index < 0 || index > toIndex) throw new IndexOutOfBoundsException();
+            if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
             List.this.remove(index);
             toIndex--;
             return true;
@@ -453,22 +456,23 @@ public class List implements HList {
             while(it.hasNext()) {
                 Object elem = it.next();
                 if(!c.contains(elem)) {
-                    List.this.remove(i+fromIndex);
+                    List.this.remove(fromIndex + i);
                     changed = true;
                 }
+                i++;
             }
             return changed;
         }
          
         @Override
         public Object set(int index, Object element) {
-            if(index<0 || index>toIndex) throw new IndexOutOfBoundsException();
-            return List.this.set(index, element);
+            if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
+            return List.this.set(fromIndex + index, element);
         }
         
         @Override
         public int size() {
-            return toIndex - fromIndex + 1;
+            return toIndex - fromIndex;
         } 
         
         @Override
