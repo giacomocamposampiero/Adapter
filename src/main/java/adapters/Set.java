@@ -29,6 +29,7 @@ public class Set implements HSet{
      * Adds the specified element to this set if it is not already present.
      * More formally, adds the specified element, o, to this set if this set contains no element e such that (o==null ? e==null : o.equals(e)). If this set already contains the specified element, the call leaves this set unchanged and returns false. In combination with the restriction on constructors, this ensures that sets never contain duplicate elements.
      * null is not a valid value in then set, so the attempt of adding a null to the set will result in the throwing of an un-checked exception
+     * The method is based on hashCode, and hash collision problem is solved in a trivial way: only the first object with a specific hash is inserted; the insertion of a different object that has the same hash won't result in a modification of the set.
      * @param o  element to be appended to this set. 
      * @return true if this set did not already contain the specified element.  
      * @throws NullPointerException if the specified element is null.
@@ -44,6 +45,7 @@ public class Set implements HSet{
      * Adds all of the elements in the specified collection to this set if they're not already present.
      * If the specified collection is also a set, the addAll operation effectively modifies this set so that its value is the union of the two sets. The behavior of this operation is unspecified if the specified collection is modified while the operation is in progress. 
      * @param c  collection whose elements are to be added to this set. 
+     * Hash collision problem is solved in a trivial way: only the first object with a specific hash is inserted; the insertion of a different object that has the same hash won't result in a modification of the set.
      * @return true if this set changed as a result of the call.
      * @throws NullPointerException if the specified element is null.
      * @throws NullPointerException if the specified collection contains an element which is null.
@@ -237,7 +239,9 @@ public class Set implements HSet{
      */
     @Override
     public Object[] toArray(Object[] a) {
-        Object[] res = (a.length >= size()) ? a : new Object[size()];
+        Object[] res; 
+        if(a.length >= size()) res = a;
+        else res = new Object[size()];        
         int i = 0;
         for (Enumeration elems = table.elements() ; elems.hasMoreElements(); i++) {
             res[i] = elems.nextElement();

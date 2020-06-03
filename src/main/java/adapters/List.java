@@ -401,7 +401,9 @@ public class List implements HList {
      */
     @Override
     public Object[] toArray(Object[] a) {
-        Object[] res = (a.length >= size()) ? a : new Object[size()];
+        Object[] res; 
+        if(a.length >= size()) res = a;
+        else res = new Object[size()];
         vec.copyInto(res);
         return res;
     }
@@ -435,6 +437,7 @@ public class List implements HList {
 
         @Override
         public void add(Object o) {
+            if(o == null) throw new IllegalArgumentException();
             vec.add(cursor++, o);
             upperBond++;
             current = -1;
@@ -465,6 +468,7 @@ public class List implements HList {
         @Override
         public void set(Object o) {
             if(current == -1) throw new IllegalStateException();
+            if(o == null) throw new IllegalArgumentException();
             vec.set(current, o);
         }
 
@@ -504,12 +508,28 @@ public class List implements HList {
             this.toIndex = toIndex;
         }
  
+        /**
+          * Inserts the specified element at the specified position in this list.
+          * Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices). 
+          * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
+          * @param index index at which the specified element is to be inserted.
+          * @param element element to be inserted. 
+          * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+          * @throws NullPointerException if the element parameter is null
+          */
         @Override
         public boolean add(Object o) {
             add(size(), o);
             return true;
         }
         
+        /**
+         * Appends the specified element to the end of this list.
+         * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
+         * @param o  element that has to be inserted. 
+         * @return  true if this list changed as a result of the call  
+         * @throws NullPointerException whether the parameter is a null reference, which is not considered a valid type of entry for the collection
+         */
         @Override
         public void add(int index, Object element) {
             if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
@@ -517,11 +537,32 @@ public class List implements HList {
             toIndex++;
         }
 
+        /**
+         * Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's iterator.
+         * The behavior of this operation is undefined if the specified collection is modified while the operation is in progress.
+         * @param c  elements to be inserted into this list.
+         * @return  true if this collection changed as a result of the call. 
+         * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+         * @throws NullPointerException if the element parameter is null
+         * @throws NullPointerException if the collection contains null elementes
+         */
         @Override
         public boolean addAll(HCollection c) {
             return addAll(size(), c);
         }
         
+        /**
+         * Inserts all of the elements in the specified collection into this list at the specified position.
+         * Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices).
+         * The new elements will appear in this list in the order that they are returned by the specified collection's iterator.
+         * The behavior of this operation is unspecified if the specified collection is modified while the operation is in progress.
+         * @param index  index at which to insert first element from the specified collection.
+         * @param c  elements to be inserted into this list.    
+         * @return  true if this list changed as a result of the call. 
+         * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
+         * @throws NullPointerException if the element parameter is null
+         * @throws NullPointerException if the collection contains null elementes
+         */
         @Override
         public boolean addAll(int index, HCollection c) {
             if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
@@ -530,17 +571,35 @@ public class List implements HList {
             return res;
         }
 
+        /**
+         * Removes all of the elements from this list.
+         * This list will be empty after this method returns unless it throws an exception. 
+         */
         @Override
         public void clear() {
             while(fromIndex < toIndex)
                 List.this.remove(--toIndex);
         }
 
+        /**
+         * Returns true if this list contains the specified element.
+         * More formally, returns true if and only if this list contains at least one element e such that (o==null ? e==null : o.equals(e)). 
+         * @param o  element whose presence in this list is to be tested. 
+         * @return  true if this list contains the specified element. 
+         * @throws NullPointerException if the parameters is null.
+         */
         @Override
         public boolean contains(Object o) {
             return indexOf(o) != -1;        
         }
 
+        /**
+         * Returns true if this list contains all of the elements of the specified collection.
+         * @param c  collection to be checked for containment in this list. 
+         * @return  true if this list contains all of the elements of the specified collection. 
+         * @throws NullPointerException if the parameters is null.
+         * @throws NullPointerException if the specified collection contains one or more null elements.
+         */
         @Override
         public boolean containsAll(HCollection c) {
             boolean res = true;
