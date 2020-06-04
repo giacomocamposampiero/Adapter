@@ -8,17 +8,17 @@ import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 /**
  *
  * @author Giacomo Camposampiero
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ListTest {
 
     private List instance;
-
-    public ListTest() {
-    }
 
     @Before
     public void setUp() {

@@ -7,11 +7,14 @@ import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 /**
  * Test suite for Set class
  * @author Giacomo Camposampiero
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SetTest {
 
     private Set instance;
@@ -553,15 +556,3 @@ public class SetTest {
     }
     
 }
-    
-
-
-    /**
-     * @title Test of parametric toArray method, class Set.
-     * @description 
-     * @expectedResults The array returned should be exactly the one which has been passed as parameter, not modified at all.
-     * @actualResult As expected result.
-     * @dependencies This set has no dependencies on other class methods.
-     * @preConditions The set instance must be a new istance of Set.
-     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
-     */
