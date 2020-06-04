@@ -483,7 +483,7 @@ public class MapTest {
     }
     
     /**
-     * @title Test of isEmpty method, of class Map.
+     * @title Test #3 of isEmpty method, of class Map.
      * @description This test tests the coherence between methods size() and isEmpty().
      * @expectedResults A coherent behaviour is expected between size() and isEmpty() methods.
      * @actualResult As expected result.
@@ -495,7 +495,11 @@ public class MapTest {
     public void testIsEmpty_size() {
         boolean size = (instance.size() == 0);
         boolean isEmpty = instance.isEmpty();
-        assertEquals("i metodi size() e isEmpty() devono essere coerenti", size, isEmpty);
+        assertEquals("i metodi devono essere coerenti quando la collezione è vuota", size, isEmpty);
+        instance.put("pippo", "pluto");
+        size = (instance.size() == 0);
+        isEmpty = instance.isEmpty();
+        assertEquals("i metodi devono essere coerenti quando la collezione è piena", size, isEmpty);
     }
     
     /**
@@ -781,15 +785,14 @@ public class MapTest {
                 });
     }
 
-
     /**
      * @title Test #1 of size method, of class Map.
      * @description This test tests the behaviour of size() method when called on an empty map.
      * @expectedResults The size is expected to be zero, as the map is empty.
      * @actualResult As expected result.
-     * @dependencies This set has no dependencies on other class methods.
-     * @preConditions The set instance must be a new istance of Map.
-     * @postConditions The set instance should not be modified by the execution of the method.
+     * @dependencies This test has no dependencies on other class methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
      */
     @Test
     public void testSize_empty() {
@@ -800,18 +803,18 @@ public class MapTest {
     /**
      * @title Test #2 of size method, of class Map.
      * @description This test tests the behaviour of size() method when called on a non-empty map.
-     * @expectedResults The size is expected to be equal to the number of elements that have been added to the list.
+     * @expectedResults The size is expected to be equal to the number of elements that have been added to the map.
      * @actualResult As expected result.
      * @dependencies Depends on the correctness of method put().
-     * @preConditions The set instance must be a new istance of Map.
-     * @postConditions The set instance should not be modified by the execution of the method (but still have to contain the entry added while testing).
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method (but still have to contain the entry added while testing).
      */
     @Test
     public void testSize_notEmpty() {
         instance.put("pippo", "asso");
         int result = instance.size();
         assertEquals("la dimensione corrisponde al numero di entry aggiunte", 1, result);
-    }
+    }    
 
     /**
      * @title Test of values method, of class Map.

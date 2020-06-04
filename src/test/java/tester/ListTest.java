@@ -4,6 +4,7 @@ import adapters.List;
 import interfaces.HIterator;
 import interfaces.HList;
 import interfaces.HListIterator;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +25,23 @@ public class ListTest {
     public void setUp() {
         instance = new List();
     }    
+    
+    /**
+     * @title Test #1 of add method, of class List.
+     * @description This test tests the behaviour of the method add() when called on a not-empty list. More in details, it only tests that the element is appended at the end of the list.
+     * @expectedResults The add method is expected to append the new element at the end of the list.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method size().
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testAdd_append() {
+        instance.add("pippo");
+        assertEquals("stringa inserita a fine lista", "pippo", instance.get(instance.size()-1));
+        instance.add("pluto");
+        assertEquals("stringa inserita a fine lista", "pluto", instance.get(instance.size()-1));
+    }
 
     /**
      * Test of add method, of class List. 
@@ -63,28 +81,7 @@ public class ListTest {
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
-    /**
-     * Test of add method, of class List.
-     */
-    @Test
-    public void testAdd_Object() {
-        String elem = "pippo";
-        boolean result = instance.add(elem);
-        assertEquals("primo elemento che inserisco", true, result);
-        result = instance.add(elem);
-        assertEquals("inserisco per la seconda volta lo stesso elemento, la lista ammette duplicati", true, result);
-        result = instance.add("pluto") && instance.get(2).equals("pluto");
-        assertEquals("inserisco una seconda stringa, verifico che sia inserita alla fine della lista", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.add(null);
-                });
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
+    
 
     /**
      * Test of addAll method, of class List.
@@ -175,37 +172,9 @@ public class ListTest {
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
   
-    /**
-     * Tests the behaviour of a sequence of add() and remove() invocations.
-     * Verifies also the coherence of the methods size() & isEmpty()
-     */
-    @Test
-    public void testAddRemoveSizeEmpty() {
-        instance.add("pippo");
-        instance.add("pluto");
-        assertEquals("controllo validità metodo size()", 2, instance.size());
-        assertEquals("controllo validità metodo isEmpty()", false, instance.isEmpty());
-        instance.remove("pippo");
-        instance.remove("pluto");
-        assertEquals("controllo validità metodo size()", 0, instance.size());
-        assertEquals("controllo validità metodo isEmpty()", true, instance.isEmpty());
-    }
     
-    /**
-     * Test of clear method, of class List.
-     * Depends also on the correctness of methods add(), clear() and isEmpty()
-     */
-    @Test
-    public void testClear() {
-        instance.clear();
-        boolean result = instance.isEmpty();
-        assertEquals("pulizia di una lista vuota, controllo che la dimensione sia nulla", true, result);
-        instance.add("pippo");
-        instance.add("pluto");
-        instance.clear();
-        result = instance.isEmpty();
-        assertEquals("pulizia di una lista piena, controllo che la dimensione sia nulla", true, result);
-    }
+    
+    
 
     /**
      * Test of contains method, of class List.
@@ -377,25 +346,6 @@ public class ListTest {
                 });
         //ClassCastException non può essere lanciata per definizione
     }
-    
-    /**
-     * Test of isEmpty method, of class Set.
-     */
-    @Test
-    public void testIsEmpty() {
-        boolean result = instance.isEmpty();
-        assertEquals("una list appena creata deve essere vuota", true, result);
-    }
-
-    /**
-     * Tests the coeherence between size() and isEmpty() methods.
-     */
-    @Test
-    public void testIsEmptySize() {
-        boolean size = (instance.size() == 0);
-        boolean isEmpty = instance.isEmpty();
-        assertEquals("i metodi size() e isEmpty() devono essere coerenti", size, isEmpty);
-    }
 
     /**
      * Test of iterator method, of class List.
@@ -527,36 +477,23 @@ public class ListTest {
     }
 
     /**
-     * Test of remove method, of class List.
-     * Depends also on add(), clear(), get() methods
+     * @title Test #1 of remove method, of class List.
+     * @description This test tests the behaviour of remove() method when called on a not-empty collection and the specified element is contained. More in details, it tests wheter the removed element is that one with the lowest index or not.
+     * @expectedResults The element remove is the one which has the lowest index between the equals object of the list.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of methods add(), isEmpty() and get().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be modified directly by the execution of the method.
      */
     @Test
     public void testRemove_Object() {
-        boolean result = instance.remove("pippo");
-        assertEquals("rimozione di un elemento in una collezione vuota", false, result);
-        String elem = "pippo";
-        instance.add(elem);
-        result = instance.remove(elem);
-        assertEquals("rimozione di un elemento presente", true, result);
-        result = instance.remove(elem);
-        assertEquals("rimozione di un elemento eliminato in precedenza", false, result);
-        instance.add(elem);
-        result = instance.remove("pippo");
-        assertEquals("verifica dell'utilizzo del metodo equals() sull'oggetto passato come parametro", true, result);
-        instance.clear();
         instance.add("pippo");
         instance.add("pluto");
         instance.add("pippo");
-        result = instance.remove("pippo") && instance.get(0).equals("pluto") && instance.get(1).equals("pippo");
+        boolean result = instance.remove("pippo") && instance.size()==2;
+        String[] expected = {"pluto", "pippo"};
+        for(int i=0; i<2; i++) result &= instance.get(i).equals(expected[i]);
         assertEquals("verifica che, in caso di duplicati, si rimuova l'istanza con indice minore", true, result);
-        
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.remove(null);
-                });
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
 
     /**
@@ -660,15 +597,6 @@ public class ListTest {
                     instance.set(instance.size(), "pippo");
                 });
     }
-    
-    /**
-     * Test of size method, of class Set.
-     */
-    @Test
-    public void testSize() {
-        int result = instance.size();
-        assertEquals("la dimensione di una lista appena creata deve essere 0", 0, result);
-    }
 
     /**
      * Test of subList method, of class List.
@@ -678,33 +606,80 @@ public class ListTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
+    
     /**
-     * Test of toArray method, of class List.
-     * Depends also on the correctness of methods add(), contains() and iterator()
+     * @title Test #1 of toArray method, of Class list.
+     * @description This test tests the behaviour of toArray() method when called on a non-empty collection. More in details, it tests that the returned array elements are placed in the right order defined by the iterator.
+     * @expectedResults The returned array must contains the list elements placed in the order defined by the iterator.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The list instance must be a new istance of Collection.
+     * @postConditions The list instance should not be modified directly by the execution of the method.
      */
     @Test
-    public void testToArray_0args() {
-        Object[] expected = new Object[0];
-        Object[] result = instance.toArray();
-        assertArrayEquals("toArray invocato su un set vuoto deve ritornare un array vuoto", expected, result);
+    public void testToArray_notEmpty() {    
         instance.add("pippo");
         instance.add("pluto");
-        result = instance.toArray();
+        
+        Object[] result = instance.toArray();
         HIterator it = instance.iterator();
-        boolean check = (result.length == instance.size());
-        for(int i=0; i<result.length; i++) {
-            check = check && instance.contains(result[i]) && it.next().equals(result[i]);
-        }   
-        assertEquals("toArray invocato su un set pieno, controllo anche che gli elementi siano presenti nell'array nello stesso ordine nel quale sono restituiti dall'iteratore", true, check);        
+        boolean check = true;
+        for(int i=0; it.hasNext() && i<result.length; i++) {
+            check = check && it.next().equals(result[i]);
+        }
+        assertEquals("gli elementi sono copiati nell'array nell'ordine definito dall'iteratore", true, check);
     }
-
+    
     /**
-     * Test of toArray method, of class List.
+     * @title Test #1 of parametric toArray method, of class List.
+     * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty list passing an array which length is greater than list size. More in detail, it tests that the elements are returned in the right order.
+     * @expectedResults The array returned should be exactly the one which has been passed as parameter, but the first size() must be modified, as they should contains the elements of this list in the right order. 
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be directly modified by the call of the method tested.
      */
     @Test
-    public void testToArray_1args() {
+    public void testParametricToArray_notEmpty() {
+        String[] param = new String[10];
+        for(int i=0; i<10; i++) param[i] = "pippo";
+        instance.add("pluto");
+        instance.add("paperino");
+        instance.add("topolino");
         
+        Object[] result = instance.toArray(param);
+        HIterator it = instance.iterator();
+        boolean check = true;
+        for(int i=0; it.hasNext(); i++) {
+            check = check && it.next().equals(result[i]);
+        }
+        assertEquals("gli elementi della lista sono stati copiati nell'ordine definito dall'iteratore", true, check);
     }
-
+    
+    /**
+     * @title Test #2 of parametric toArray method, of class List.
+     * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty collection using an array which is not big enough to contain the whole list. More in details, the it tests the order of the returned array.
+     * @expectedResults The array returned should be a new istance of a generic Object array (the parameter should not be modified), and it should contains all the elements contained in the list in the proper order.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctess of method add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should be directly modified by the call of this method.
+     */
+    @Test
+    public void testParametricToArray_notBigEnough() {
+        String[] param = new String[1];
+        param[0] = "pippo";
+        instance.add("pluto");
+        instance.add("paperino");
+        instance.add("topolino");
+        
+        Object[] result = instance.toArray(param);
+        HIterator it = instance.iterator();
+        boolean check = true;
+        for(int i=0; it.hasNext(); i++) {
+            check = check && it.next().equals(result[i]);
+        }
+        assertEquals("gli elementi della lista sono stati copiati nell'ordine definito dall'iteratore", true, check);
+    }
+    
 }
