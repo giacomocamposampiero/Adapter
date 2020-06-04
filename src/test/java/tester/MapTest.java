@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 
+ * Test suite for Map class
  * @author Giacomo Camposampiero
  */
 public class MapTest {
@@ -152,6 +152,86 @@ public class MapTest {
     }
     
     /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when both the two maps compared are empty
+     */
+    @Test
+    public void testEquals_empty() {
+        Map other = new Map();
+        boolean result = instance.equals(other);
+        assertEquals("due mappe vuote dovrebbero essere equivalenti", true, result);    
+    }
+    
+    /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when one of the two maps compared is empty
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testEquals_oneIsEmpty() {
+        Map other = new Map();
+        other.put("pippo", "asso");
+        boolean result = instance.equals(other);
+        assertEquals("una mappa vuota e l'altra no, non sono equivalenti", false, result);    
+    }
+    
+    /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when the two maps are not equivalents
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testEquals_notEquivalents() {
+        instance.put("pluto", "beta");
+        Map other = new Map();
+        other.put("pippo", "asso");
+        boolean result = instance.equals(other);
+        assertEquals("mappe non vuote e non equivalenti tra loro", false, result);    
+    }
+    
+    /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when the two maps are equivalents
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testEquals_equivalents() {
+        instance.put("pippo", "asso");
+        Map other = new Map();
+        other.put("pippo", "asso");
+        boolean result = instance.equals(other);
+        assertEquals("mappe non vuote ed equivalenti tra loro", true, result);    
+    }
+    
+    /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when the two contains the same set of keys, but different values
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testEquals_sameKeys() {
+        instance.put("pippo", "beta");
+        Map other = new Map();
+        other.put("pippo", "asso");
+        boolean result = instance.equals(other);
+        assertEquals("mappe aventi lo stesso set di chiavi, ma values differenti", false, result);    
+    }
+    
+    /**
+     * Test of equals method, of class Map.
+     * This test tests the behaviour of equals() method when the two contains the same set of values, but different keys
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testEquals_sameValues() {
+        instance.put("pluto", "asso");
+        Map other = new Map();
+        other.put("pippo", "asso");
+        boolean result = instance.equals(other);
+        assertEquals("mappe aventi lo stesso set di values, ma keys differenti", false, result);    
+    }
+    
+    /**
      * Test of entrySet method, of class Map.
      */
     @Test
@@ -196,6 +276,18 @@ public class MapTest {
     
     /**
      * Test of get method, of class Map.
+     * This test tests the behaviour of get() method when is called using a key which is not contained, but has the same hash of one of the key contained
+     * Depends on the correctness of methods put()
+     */
+    @Test
+    public void testGet_hash() {
+        instance.put("AaAaAa", "asso");
+        Object result = instance.get("AaAaBB");
+        assertEquals("test utilizzo hash nel confronto della chiave", null, result);  
+    }
+    
+    /**
+     * Test of get method, of class Map.
      * This test tests the coherence between the methods containsKey() and get()
      * In fact, this implementation of the map doesn't accept null elements, so a null value is returned only when the key is not contained in the map
      * Depends on the correctness of methods put() and containsKey()
@@ -204,9 +296,9 @@ public class MapTest {
     public void testGet_containsKey() {
         instance.put("pippo", "asso");
         boolean result = instance.get("pluto") == null && !instance.containsKey("pluto");
-        assertEquals("controllo coerenza tra metodi get e containsKey", true, result);  
+        assertEquals("controllo coerenza tra metodi get e containsKey, chiave non contenuta", true, result);  
         result = instance.get("pippo") == null && !instance.containsKey("pippo");
-        assertEquals("controllo coerenza tra metodi get e containsKey", false, result);
+        assertEquals("controllo coerenza tra metodi get e containsKey, chiave contenuta", false, result);
     }
     
     /**
@@ -223,26 +315,49 @@ public class MapTest {
 
     /**
      * Test of isEmpty method, of class Map.
+     * This test tests the behaviour of the method isEmpty() when called on an empty Map
      */
     @Test
-    public void testIsEmpty() {
-
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testIsEmpty_empty() {
+        boolean result = instance.isEmpty();
+        assertEquals("controllo su collezione vuota", true, result); 
     }
-
+    
+    /**
+     * Test of isEmpty method, of class Map.
+     * This test tests the behaviour of the method isEmpty() when called on an empty Map
+     * Depends on the correctness of method put()
+     */
+    @Test
+    public void testIsEmpty_notEmpty() {
+        instance.put("pippo", "asso");
+        boolean result = instance.isEmpty();
+        assertEquals("controllo su collezione non vuota", false, result); 
+    }
+    
+    /**
+     * Test of isEmpty method, of class Map.
+     * This test tests the coherence between methods size() and isEmpty()
+     */
+    @Test
+    public void testIsEmpty_size() {
+        boolean size = (instance.size() == 0);
+        boolean isEmpty = instance.isEmpty();
+        assertEquals("i metodi size() e isEmpty() devono essere coerenti", size, isEmpty);
+    }
+    
     /**
      * Test of keySet method, of class Map.
      */
     @Test
     public void testKeySet() {
-
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
 
     /**
      * Test of put method, of class Map.
+     * This test tests the behaviour of method put() when is called on an empty Map
      */
     @Test
     public void testPut() {

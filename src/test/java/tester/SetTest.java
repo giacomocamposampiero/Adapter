@@ -2,6 +2,7 @@ package tester;
 
 import adapters.Set;
 import interfaces.HIterator;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -24,7 +25,7 @@ public class SetTest {
     }
 
     /**
-     * Test of size method, of class Set.
+     * @title Test of size method, of class Set.
      */
     @Test
     public void testSize() {
@@ -33,7 +34,7 @@ public class SetTest {
     }
 
     /**
-     * Test of isEmpty method, of class Set.
+     * @title Test of isEmpty method, of class Set.
      */
     @Test
     public void testIsEmpty() {
@@ -52,7 +53,7 @@ public class SetTest {
     }
 
     /**
-     * Test of add method, of class Set.
+     * @title Test of add method, of class Set.
      */
     @Test
     public void testAdd() {
@@ -77,7 +78,7 @@ public class SetTest {
     }
 
     /**
-     * Test of remove method, of class Set.
+     * @title Test of remove method, of class Set.
      */
     @Test
     public void testRemove() {
@@ -94,7 +95,7 @@ public class SetTest {
     }
 
     /**
-     * Test of remove method, used after the invocation of the method add().
+     * @title Test of remove method, used after the invocation of the method add().
      * Depends on the correctness of the method add()
      */
     @Test
@@ -127,7 +128,7 @@ public class SetTest {
     }
 
     /**
-     * Test of contains method, of class Set. Depends on the correctness of the
+     * @title Test of contains method, of class Set. Depends on the correctness of the
      * methods add() and remove()
      */
     @Test
@@ -153,7 +154,7 @@ public class SetTest {
     }
 
     /**
-     * Test of containsAll method, of class Set. 
+     * @title Test of containsAll method, of class Set. 
      * Depends on the correctness of methods add() and remove()
      */
     @Test
@@ -191,7 +192,7 @@ public class SetTest {
     }
 
     /**
-     * Test of addAll method, of class Set. Depends on the correcteness of the
+     * @title Test of addAll method, of class Set. Depends on the correcteness of the
      * methods clear(), containAll(), add(), remove(), size(), isEmpty()
      */
     @Test
@@ -227,7 +228,7 @@ public class SetTest {
     }
 
     /**
-     * Test of retainAll method, of class Set. 
+     * @title Test of retainAll method, of class Set. 
      * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
      */
     @Test
@@ -262,7 +263,7 @@ public class SetTest {
     }
 
     /**
-     * Test of removeAll method, of class Set.
+     * @title Test of removeAll method, of class Set.
      */
     @Test
     public void testRemoveAll() {
@@ -296,7 +297,7 @@ public class SetTest {
     }
 
     /**
-     * Test of clear method, of class Set. 
+     * @title Test of clear method, of class Set. 
      * Depends on the correcteness of methot add()
      */
     @Test
@@ -312,7 +313,7 @@ public class SetTest {
     }
 
     /**
-     * Test of iterator method, of class Set. Depends on the correcteness of
+     * @title Test of iterator method, of class Set. Depends on the correcteness of
      * method add()
      */
     @Test
@@ -374,7 +375,7 @@ public class SetTest {
     }
 
     /**
-     * Test of toArray method, of class Set.
+     * @title Test of toArray method, of class Set.
      * Depends also on the correctness of methods add(), contains() and iterator()
      */
     @Test
@@ -394,7 +395,7 @@ public class SetTest {
     }
 
     /**
-     * Test of equals method, of class Set.
+     * @title Test of equals method, of class Set.
      * Depends on the correctness of method add()
      */
     @Test
@@ -411,7 +412,7 @@ public class SetTest {
     }
 
     /**
-     * Test of hashCode method, of class Set.
+     * @title Test of hashCode method, of class Set.
      * Depends on the correctness of method add()
      */
     @Test
@@ -441,16 +442,126 @@ public class SetTest {
         boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
         assertEquals("confronto di due set diversi", true, result);
     }
-    
+        
     /**
-     * Test the throwing of UnsupportedOperationException exception.
+     * @title Test #1 of parametric toArray method, class Set.
+     * @description This test tests the behaviour of the parametric toArray() when an empty array is used as parameter and the set is empty
+     * @expectedResults The array returned should be exactly the one which has been passed as parameter, not modified at all.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
      */
     @Test
-    public void testToArray_1args() {
-        assertThrows("invocato metodo toArray parametrico", UnsupportedOperationException.class,
+    public void testParametricToArray_bothEmpty() {
+        String[] param = new String[0];
+        Object[] result;
+        result = instance.toArray(param);
+        assertArrayEquals("set e array vuoti, dovrebbe coincidere", param, result);
+    }
+    
+    /**
+     * @title Test #2 of parametric toArray method, class Set.
+     * @description This test tests the behaviour of the parametric toArray() when a not-empty array is used as parameter and the set is empty. This method test also wheter the method modify the only the first size() cells of the param array.
+     * @expectedResults The array returned should be exactly the one which has been passed as parameter, but the first set.size() cells must contains the elements of the set.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
+     */
+    @Test
+    public void testParametricToArray_setEmpty() {
+        String[] param = new String[10];
+        for(int i=0; i<10; i++) param[i] = "pippo";
+        Object[] result;
+        result = instance.toArray(param);
+        assertArrayEquals("set vuoto e array riempito, dovrebbe coincidere", param, result);
+    }
+    
+    /**
+     * @title Test #3 of parametric toArray method, class Set.
+     * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty set passing a not-empty array which length is greater than set size.
+     * @expectedResults The array returned should be exactly the one which has been passed as parameter, but the first size() must be modified, as they should contains the elements of this set. The elements contained in the array in positions >= size() should not be modified.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
+     */
+    @Test
+    public void testParametricToArray_notEmpty() {
+        String[] param = new String[10];
+        for(int i=0; i<10; i++) param[i] = "pippo";
+        instance.add("pluto");
+        instance.add("paperino");
+        instance.add("topolino");
+        
+        Object[] result = instance.toArray(param);
+        assertEquals("il tipo dell'array ritornato coincide con quello dell'array parametro", true, result.getClass().equals(param.getClass()));
+        boolean check = true;
+        for(int i=0; i<instance.size(); i++) {
+            check = check && instance.contains(result[i]);
+        }
+        for(int i=instance.size(); i<result.length; i++) {
+            check = check && result[i].equals(param[i]);
+        }
+        assertEquals("gli elementi del set sono stati copiati nelle prime size()-1 posizioni, le successive non sono state modificate", true, check);
+    }
+    
+    /**
+     * @title Test #4 of parametric toArray method, class Set.
+     * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty set using an array which is not big enough to contain the whole set.
+     * @expectedResults The array returned should be a new istance of a generic Object array (the parameter should not be modified), and it should contains all the elements contained in the set.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctess of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
+     */
+    @Test
+    public void testParametricToArray_notBigEnough() {
+        String[] param = new String[1];
+        param[0] = "pippo";
+        String[] copyParam = Arrays.copyOf(param, param.length);
+        instance.add("pluto");
+        instance.add("paperino");
+        instance.add("topolino");
+        
+        Object[] result = instance.toArray(param);
+        assertEquals("il tipo dell'array ritornato non coincide con quello dell'array parametro", false, result.getClass().equals(param.getClass()));
+        boolean check = instance.size() == result.length;
+        for (Object tmp : result) {
+            check = check && instance.contains(tmp);
+        }
+        assertEquals("gli elementi del set sono tutti presenti e le dimensioni del risultato e dell'istanza di set coincidono", true, check);
+        assertArrayEquals("l'array parametro non è stato modificato", copyParam, param);
+    }
+    
+    /**
+     * @title Test #5 of parametric toArray method, class Set.
+     * @description This test tests the behaviour of parametric toArray() method when a null reference is used as parameter.
+     * @expectedResults A NullPointerException was thrown as result of the call.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
+     */
+    @Test
+    public void testParametricToArray_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
-                    instance.toArray(new Object[1]);
+                    instance.toArray(null);
                 });
     }
-
+    
 }
+    
+
+
+    /**
+     * @title Test of parametric toArray method, class Set.
+     * @description 
+     * @expectedResults The array returned should be exactly the one which has been passed as parameter, not modified at all.
+     * @actualResult As expected result.
+     * @dependencies This set has no dependencies on other class methods.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified after the call of this method (more formally, initialInstance.equals(finalInstance) must be true).
+     */
