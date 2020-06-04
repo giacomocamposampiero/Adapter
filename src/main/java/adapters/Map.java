@@ -49,6 +49,8 @@ public class Map implements HMap {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    //hashcode entry
+    //31 * e.getKey().hashCode() + e.getValue().hashCode()
     @Override
     public int hashCode() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.        

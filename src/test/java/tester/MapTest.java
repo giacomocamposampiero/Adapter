@@ -4,11 +4,14 @@ import adapters.Map;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
 /**
  * Test suite for Map class
  * @author Giacomo Camposampiero
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MapTest {
     
     Map instance;
@@ -411,6 +414,40 @@ public class MapTest {
         assertEquals("controllo coerenza tra metodi get e containsKey, chiave non contenuta", true, result);  
         result = instance.get("pippo") == null && !instance.containsKey("pippo");
         assertEquals("controllo coerenza tra metodi get e containsKey, chiave contenuta", false, result);
+    } 
+        
+    /**
+     * @title Test #1 of hashCode method, of class Map.
+     * @description This test tests the behaviour of hashCode() method when is called on an empty map.
+     * @expectedResults The result hash is expected to be 0, as is definide as the sum of all the map entries hashcode, and the map is empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods of the class Map.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashCode_empty() {
+        int result = instance.hashCode();
+        assertEquals("hash di una mappa vuota deve essere zero", 0, result);        
+    }
+    
+    /**
+     * @title Test #2 of hashCode method, of class Map.
+     * @description This test tests the behaviour of hashCode() method when is called on a not-empty map.
+     * @expectedResults The result hash is expected to the sum of all the map entries hashcode, as it defined in this way.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of the method put().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance doesn't have to be modified by the execution of the method tested (but the map still have to contain the entry inserted during the testing process).
+     */
+    @Test
+    public void testHashCode_notEmpty() {
+        String val1 = "pippo", key1 = "asso", val2 = "pluto", key2 = "topolino";
+        instance.put(key1, val1);
+        instance.put(key2, val2);
+        int expected = (31*key1.hashCode()+val1.hashCode()) + (31*key2.hashCode()+val2.hashCode());
+        int result = instance.hashCode();
+        assertEquals("hash di una mappa piena deve essere uguale alla somma degli hash delle sue entry", expected, result);        
     }
 
     /**
@@ -563,27 +600,186 @@ public class MapTest {
                 });
     }
     
+    /**
+     * @title Test of put and remove methods, of class Map.
+     * @description This test tests the behaviour of class Map when multiple put/remove operations are performed in sequence.
+     * @expectedResults The map is expected to perform all the put/remove operations successfully.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of methods size() and isEmpty().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance has to be modified by the operations perfomed on it.
+     */
+    @Test
+    public void testPut_Remove() {
+        instance.put("pippo", "pluto");
+        assertEquals("inserito il primo elemento", 1, instance.size());
+        instance.put("pippo", "pluto");
+        instance.put("asso", "topolino");    
+        assertEquals("inserimento di due elementi, di cui uno già presente", 2, instance.size());
+        instance.remove("pippo");
+        assertEquals("rimozione di un elemento", 1, instance.size());
+        instance.put("pippo", "pluto");
+        assertEquals("inserimento di un elemento appena eliminato", 2, instance.size());
+        instance.remove("pippo");
+        instance.remove("asso");
+        assertEquals("inserimento di tutti gli elementi della mappa", true, instance.isEmpty());
+    }
+
+    /**
+     * @title Test #1 of putAll method, of class Map.
+     * @description This test tests the behaviour of class Map when putAll() method is called using an empty map as parameter
+     * @expectedResults The map shouldn't do anything.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of method isEmpty
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance shouldn't be modified by the operations perfomed on it.
+     */
+    @Test
+    public void testPutAll_empty() {
+        instance.putAll(instance);
+        assertEquals("la mappa deve rimanere inalterata", true, instance.isEmpty());
+    }
     
-
     /**
-     * @title Test of putAll method, of class Map.
+     * @title Test #2 of putAll method, of class Map.
+     * @description This test tests the behaviour of class Map when putAll() method is called using a map which contains only entries which are not contained in this map.
+     * @expectedResults The map must add all the elements of the other map.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of methods size() and put().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance has to be modified by the operations perfomed on it.
      */
     @Test
-    public void testPutAll() {
-
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testPutAll_notContained() {
+        Map other = new Map();
+        other.put("pippo", "asso");
+        other.put("pluto", "topolino");
+        other.put("paperino", "pluto");
+        instance.putAll(other);
+        assertEquals("la mappa deve aggiungere tutti gli elementi dell'altra mappa", 3, instance.size());
+    }
+    
+    /**
+     * @title Test #3 of putAll method, of class Map.
+     * @description This test tests the behaviour of class Map when putAll() method is called using a map which contains a miscellaneous of elements that could be problematic.
+     * @expectedResults The map must add just some of the entries of the other map.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of methods size() and put().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance has to be modified by the operations perfomed on it.
+     */
+    @Test
+    public void testPutAll_miscellaneous() {
+        instance.put("AaAaAa", "asso");
+        instance.put("pippo", "pluto");
+        Map other = new Map();
+        other.put("pippo", "asso");
+        other.put("pluto", "topolino");
+        other.put("paperino", "pluto");
+        other.put("AaAaBB", "paperino");
+        instance.putAll(other);
+        assertEquals("la mappa deve aggiungere 3 soli elementi su 4", 5, instance.size());
+    }
+    
+    /**
+     * @title Test #4 of putAll method, of class Map.
+     * @description This test tests the behaviour of class Map when putAll() method is called using a null reference as parameter. The result of an invocation of the method using as parameter a map which contains null elements cannot be tested, as we don't have Map implementations which support null elements.
+     * @expectedResults The map must should throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of method put().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance has to be modified by the operations perfomed on it.
+     */
+    @Test
+    public void testPutAll_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.putAll(null);
+                });
     }
 
     /**
-     * @title Test of remove method, of class Map.
+     * @title Test #1 of remove method, of class Map.
+     * @description This test tests the behaviour of class Map when remove() method is called on an empty map.
+     * @expectedResults The map is expected to return a null reference, as the element wasn't contained in the map (which is empty).
+     * @actualResult As expected result.
+     * @dependencies  This test doesn't depend on the correctness of any other method of the class.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance is not modified as result of the test of the method.
      */
     @Test
-    public void testRemove() {
-
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testRemove_empty() {
+        Object result = instance.remove("pippo");
+        assertEquals("rimozione su lista vuota", null, result);
     }
+    
+    /**
+     * @title Test #2 of remove method, of class Map.
+     * @description This test tests the behaviour of class Map when remove() method is called on a map which not contains the specified key.
+     * @expectedResults The map is expected to return a null reference, as the element wasn't contained in the map.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of the methods put() and size().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance is not modified as direct result of the test of the method (but the map still has to contain the value inserted during the test).
+     */
+    @Test
+    public void testRemove_notContained() {
+        instance.put("pluto", "asso");
+        Object result = instance.remove("pippo");
+        assertEquals("rimozione di un elemento non presente", null, result);
+        assertEquals("dimensione costante", 1, instance.size());
+    }
+    
+    /**
+     * @title Test #3 of remove method, of class Map.
+     * @description This test tests the behaviour of class Map when remove() method is called on a map which contains the specified key.
+     * @expectedResults The map is expected to return the previous value which was mapped with the key specified. The size of the map has to decrease.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of the methods put() and isEmpty().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance is modified as direct result of the test of the method.
+     */
+    @Test
+    public void testRemove_contained() {
+        instance.put("pluto", "asso");
+        Object result = instance.remove("pluto");
+        assertEquals("rimozione di un elemento presente", "asso", result);
+        assertEquals("dimensione diminuita", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #4 of remove method, of class Map.
+     * @description This test tests the behaviour of class Map when remove() method is called on a map using a key which has the same hash of a key contained, but is not the same object.
+     * @expectedResults The map is expected to return a null reference, as the key is not really contained in the map.
+     * @actualResult As expected result.
+     * @dependencies  Depends on the correctness of the methods put() and size().
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance is not modified as direct result of the test of the method.
+     */
+    @Test
+    public void testRemove_hash() {
+        instance.put("AaAaAa", "asso");
+        Object result = instance.remove("AaAaBB");
+        assertEquals("rimozione di una chiave con hash uguale ad una chiave presente", null, result);
+    }
+    
+    /**
+     * @title Test #5 of remove method, of class Map.
+     * @description This test tests the behaviour of class Map when remove() method is called using a null reference as parameter.
+     * @expectedResults The map is expected to throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies  The correctness of this method does not depends on the correctness of any other method of Map.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance is not modified as direct result of the test of the method.
+     */
+    @Test
+    public void testRemove_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.remove(null);
+                });
+    }
+
 
     /**
      * @title Test #1 of size method, of class Map.
@@ -598,7 +794,6 @@ public class MapTest {
     public void testSize_empty() {
         int result = instance.size();
         assertEquals("la dimensione di una mappa appena creata è 0", 0, result);
-        
     }
     
     /**
@@ -612,9 +807,9 @@ public class MapTest {
      */
     @Test
     public void testSize_notEmpty() {
+        instance.put("pippo", "asso");
         int result = instance.size();
-        assertEquals("la dimensione di una mappa appena creata è 0", 0, result);
-        
+        assertEquals("la dimensione corrisponde al numero di entry aggiunte", 1, result);
     }
 
     /**
@@ -627,14 +822,3 @@ public class MapTest {
     }
     
 }
-
-
-/**
-     * @title Test of .
-     * @description 
-     * @expectedResults T
-     * @actualResult As expected result.
-     * @dependencies This set has no dependencies on other class methods.
-     * @preConditions The set instance must be a new istance of .
-     * @postConditions The set instance should be m
-     */
