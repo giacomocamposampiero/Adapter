@@ -259,6 +259,7 @@ public interface HMap {
      * the <tt>setValue</tt> operation on the map entry.
      */
     interface Entry {
+        
         /**
          * Returns the key corresponding to this entry.
          *

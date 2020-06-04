@@ -1,6 +1,7 @@
 package tester;
 
 import adapters.Map;
+import interfaces.HMap;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -213,7 +214,7 @@ public class MapTest {
      */
     @Test
     public void testEquals_empty() {
-        Map other = new Map();
+        HMap other = new Map();
         boolean result = instance.equals(other);
         assertEquals("due mappe vuote dovrebbero essere equivalenti", true, result);    
     }
@@ -445,7 +446,7 @@ public class MapTest {
         String val1 = "pippo", key1 = "asso", val2 = "pluto", key2 = "topolino";
         instance.put(key1, val1);
         instance.put(key2, val2);
-        int expected = (31*key1.hashCode()+val1.hashCode()) + (31*key2.hashCode()+val2.hashCode());
+        int expected = (key1.hashCode()^val1.hashCode()) + (key2.hashCode()^val2.hashCode());
         int result = instance.hashCode();
         assertEquals("hash di una mappa piena deve essere uguale alla somma degli hash delle sue entry", expected, result);        
     }

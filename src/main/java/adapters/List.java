@@ -33,12 +33,8 @@ public class List implements HList {
      */    
     @Override
     public void add(int index, Object element) {
-        if (element == null) {
-            throw new NullPointerException();
-        }
-        if (index < 0 || index > size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (element == null) throw new NullPointerException();
+        if (index < 0 || index > size()) throw new IndexOutOfBoundsException();
         vec.insertElementAt(element, index);
     }
 
@@ -83,9 +79,7 @@ public class List implements HList {
      */
     @Override
     public boolean addAll(int index, HCollection c) {
-        if (index < 0 || index > size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (index < 0 || index > size()) throw new IndexOutOfBoundsException();
         boolean res = false;
         HIterator it = c.iterator();
         while (it.hasNext()) {
@@ -113,9 +107,7 @@ public class List implements HList {
      */
     @Override
     public boolean contains(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
+        if (o == null) throw new NullPointerException();
         return vec.contains(o);
     }
 
@@ -186,9 +178,7 @@ public class List implements HList {
      */
     @Override
     public Object get(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
         return vec.elementAt(index);
     }
 
@@ -201,9 +191,7 @@ public class List implements HList {
      */
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
+        if (o == null) throw new NullPointerException();
         return vec.indexOf(o);
     }
 
@@ -234,9 +222,7 @@ public class List implements HList {
      */
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
+        if (o == null) throw new NullPointerException();
         return vec.lastIndexOf(o);
     }
 
@@ -258,9 +244,7 @@ public class List implements HList {
      */
     @Override
     public HListIterator listIterator(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
         return new ListIterator(index, size());
     }
 
@@ -273,9 +257,7 @@ public class List implements HList {
      */
     @Override
     public Object remove(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
         Object old = get(index);
         vec.removeElementAt(index);
         return old;
@@ -290,9 +272,7 @@ public class List implements HList {
      */
     @Override
     public boolean remove(Object o) {
-        if (o == null) {
-            throw new NullPointerException();
-        }
+        if (o == null) throw new NullPointerException();
         return vec.remove(o);
     }
 
@@ -342,12 +322,8 @@ public class List implements HList {
      */
     @Override
     public Object set(int index, Object element) {
-        if (element == null) {
-            throw new NullPointerException();
-        }
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
+        if (element == null) throw new NullPointerException();
+        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
         Object old = get(index);
         vec.setElementAt(element, index);
         return old;
