@@ -25,6 +25,14 @@ public class Set implements HSet{
         this.table = new Hashtable(initialCapacity);
     }
     
+    public Set(Set other) {
+        this.table = new Hashtable();
+        HIterator it = other.iterator();
+        while(it.hasNext()) {
+            table.put(it.next(), 1);
+        }
+    }
+    
     /**
      * Adds the specified element to this set if it is not already present.
      * More formally, adds the specified element, o, to this set if this set contains no element e such that (o==null ? e==null : o.equals(e)). If this set already contains the specified element, the call leaves this set unchanged and returns false. In combination with the restriction on constructors, this ensures that sets never contain duplicate elements.
@@ -36,8 +44,8 @@ public class Set implements HSet{
      */
     @Override
     public boolean add(Object o) {
-        if(table.containsKey(o.hashCode())) return false;
-        table.put(o.hashCode(), o);
+        if(table.containsKey(o)) return false;
+        table.put(o, 1);
         return true;
     }
 
@@ -78,9 +86,7 @@ public class Set implements HSet{
      */
     @Override
     public boolean contains(Object o) {
-        int hash = o.hashCode();
-        if(!table.containsKey(hash)) return false;
-        return o.equals(table.get(hash));
+        return table.containsKey(o);
     }
 
     /**
@@ -109,14 +115,17 @@ public class Set implements HSet{
      */
     @Override 
     public boolean equals(Object o) {
-         if (o == this) return true; 
-        if (!(o.getClass().equals(this.getClass()))) { 
-            return false; 
-        }    
+        if (o == this) {
+            return true;
+        } 
+        if (!(o.getClass().equals(this.getClass()))){
+            return false;
+        }  
         Set other = (Set) o;
         if (other.size() != size()) return false;
-        for (Enumeration elems = table.elements() ; elems.hasMoreElements() ;) {
-            if(!other.contains(elems.nextElement())) return false;
+        HIterator it = iterator();
+        while(it.hasNext()) {
+            if(!other.contains(it.next())) return false;
         }
         return true;
     }
@@ -129,9 +138,9 @@ public class Set implements HSet{
     @Override 
     public int hashCode() {
         int hash = 0;
-        for (Enumeration elems = table.elements() ; elems.hasMoreElements() ;) {
-            hash += elems.nextElement().hashCode();
-        }
+        HIterator it = iterator();
+        while(it.hasNext())
+            hash += it.next().hashCode();
         return hash;
     }
     
@@ -164,7 +173,7 @@ public class Set implements HSet{
     @Override
     public boolean remove(Object o) {
         if(!contains(o)) return false;
-        table.remove(o.hashCode());
+        table.remove(o);
         return true;
     }
 
@@ -242,42 +251,44 @@ public class Set implements HSet{
     public Object[] toArray(Object[] a) {
         if(a == null) throw new NullPointerException();
         Object[] res; 
-        if(a.length >= size()) res = a;
-        else res = new Object[size()];        
+        if(a.length >= size()) {
+            res = a;
+        } else {
+            res = new Object[size()];
+        }        
         int i = 0;
-        for (Enumeration elems = table.elements() ; elems.hasMoreElements(); i++) {
-            res[i] = elems.nextElement();
-        }
+        HIterator it = iterator();
+        while(it.hasNext()) res[i++] = it.next();
         return res;
     }
     
     class SetIterator implements HIterator {
         
-        Object currentKey;
-        Enumeration keys;
+        Object currentElem;
+        Enumeration elems;
         
         public SetIterator() {
-            currentKey = null;
-            keys = table.keys();
+            currentElem = null;
+            elems = table.keys();
         }
         
         @Override
         public boolean hasNext() {
-            return keys.hasMoreElements();
+            return elems.hasMoreElements();
         }
 
         @Override
         public Object next() {
             if(!hasNext()) throw new NoSuchElementException();   
-            currentKey = keys.nextElement();
-            return table.get(currentKey);
+            currentElem = elems.nextElement();
+            return currentElem;
         }
 
         @Override
         public void remove() {
-            if(currentKey == null) throw new IllegalStateException();
-            table.remove(currentKey);
-            currentKey = null;
+            if(currentElem == null) throw new IllegalStateException();
+            table.remove(currentElem);
+            currentElem = null;
         }
         
     }

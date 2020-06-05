@@ -1,10 +1,10 @@
 package tester;
 
 import adapters.List;
+import interfaces.HCollection;
 import interfaces.HIterator;
 import interfaces.HList;
 import interfaces.HListIterator;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +41,23 @@ public class ListTest {
         assertEquals("stringa inserita a fine lista", "pippo", instance.get(instance.size()-1));
         instance.add("pluto");
         assertEquals("stringa inserita a fine lista", "pluto", instance.get(instance.size()-1));
+    }
+    
+    /**
+     * @title Test #2 of add method, of class List.
+     * @description This test tests the behaviour of the method add() when called on a not-empty list using a parameter which is already contained in the list.
+     * @expectedResults List allows duplicates, the new entry should be accepted.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method size().
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testAdd_duplicates() {
+        instance.add("pippo");
+        boolean result = instance.add("pippo");
+        assertEquals("inserimento duplicato", true, result);
+        assertEquals("controllo aumento dimensione", 2, instance.size());
     }
 
     /**
@@ -80,53 +97,49 @@ public class ListTest {
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
-
     
-
     /**
-     * Test of addAll method, of class List.
-     * Depends also on the correctness of methods add(), size(), clear() and get()
+     * @title Test #1 of addAll method, of class List.
+     * @description This test tests the behaviour of the method addAll() when called on a not-empty list. More in details, it only tests that the element is appended at the end of the list in the precise order defined by the iterator.
+     * @expectedResults The add method is expected to append the new elements at the end of the list.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method size().
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is directly modified by the execution of the method tested.
      */
     @Test
-    public void testAddAll_HCollection() {
-        List list = new List();
-        boolean result = instance.addAll(list) || !instance.isEmpty();
-        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della lista", false, result);
+    public void testAddAll_append() {
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pluto");
+        instance.add("paperino");
+        instance.addAll(param);
+        boolean res = true;
+        HIterator instIt = instance.iterator();
+        instIt.next();
+        HIterator it = param.iterator();
+        while(it.hasNext()) res &= it.next().equals(instIt.next());
+        assertEquals("elementi aggiunti in fondo nell'ordine corretto", true, res);
+    }
+    
+    /**
+     * @title Test #2 of addAll method, of class List.
+     * @description This test tests the behaviour of the method addAll() when called using a collection which contains elements which are already contained in the list.
+     * @expectedResults The elementes which are already contained should be added without problems in the list, duplicates are allowed.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods size() and add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance has to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_contained() {
         instance.add("pippo");
-        list.add("pippo");
-        result = instance.addAll(list) && instance.size() == 2;
-        assertEquals("aggiunta di una collezione con elementi già presenti", true, result);
-        list.add("pluto");
-        result = instance.addAll(list) && instance.size() == 4;
-        assertEquals("aggiunta di una collezione con nuovi elementi e elementi già presenti", true, result);
-        list.clear();
-        list.add("topolino");
-        result = instance.addAll(list) && instance.size() == 5;
-        assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
-        list.add("pippo");
-        list.add("pluto");
-        result = instance.addAll(list) && (instance.size()==8);
-        HIterator itInst = instance.iterator();
-        HIterator itList = list.iterator();
-        int i = 0;
-        while(itInst.hasNext()) {
-            Object o = itInst.next();
-            if(i>4 && itList.hasNext()) {
-                result = result && o.equals(itList.next());
-            }
-            i++;
-        }
-        assertEquals("controllo che gli elementi della collezione siano aggiunti nell'ordine in cui sono restituiti dall'iteratore", true, result);
-        
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.addAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pluto");
+        boolean result = instance.addAll(param);
+        assertEquals("ci sono elementi nuovi, vengono aggiunti e lo stato della lista cambia", true, result);
+        assertEquals("tutti gli elementi sono aggiunti", 3, instance.size());
     }
 
     /**
@@ -172,88 +185,152 @@ public class ListTest {
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
   
-    
-    
-    
-
     /**
-     * Test of contains method, of class List.
-     * Depends also on the correctness of methods add() and remove()
+     * @title Test #1 of contains method, of class List.
+     * @description This test tests the behaviour of the method contains() when called on a list which contains multiple elements which equals to the parameter.
+     * @expectedResults The parameter should be contained.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
      */
     @Test
-    public void testContains() {
-        String elem = "pippo";
-        boolean result = instance.contains(elem);
-        assertEquals("metodo invocato su una collezione vuota", false, result);
-        instance.add(elem);
-        result = instance.contains(elem);
-        assertEquals("metodo invocato con un parametro valido", true, result);
-        result = instance.contains("pippo");
-        assertEquals("verifica che il metodo sia basato su equals()", true, result);
-        instance.remove(elem);
-        result = instance.contains(elem);
-        assertEquals("metodo invocato con un parametro che è stato in precedenza cancellato", false, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.contains(null);
-                });
-        //ClassCastException non può essere controllata per definizione
+    public void testContains_multiple() {
+        instance.add("pippo");
+        instance.add("pippo");
+        instance.add("pippo");
+        boolean result = instance.contains("pippo");
+        assertEquals("collezione che contiene più istanze del parametro", true, result);
     }
-
+    
     /**
-     * Test of containsAll method, of class List.
+     * @title Test #1 of containsAll method, of class List.
+     * @description This test tests the behaviour of the method containsAll() when called on a list which contains multiple elements which equals to the parameter.
+     * @expectedResults The parameter should be contained.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
      */
     @Test
-    public void testContainsAll() {
-        List list = new List();
-        boolean result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione vuota", true, result);
-        String elem1 = "pippo", elem2 = "pluto", elem3 = "topolino";
-        list.add(elem1);
-        list.add(elem2);
-        list.add(elem3);
+    public void testContainsAll_multiple() {
+        instance.add("pippo");
         instance.add("pippo");
         instance.add("pluto");
-        instance.add("topolino");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione valida, verifica anche che il confronto tra elementi sia eseguito mediante il metodo equals()", true, result);
-        instance.remove("topolino");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione valida con parametri non tutti contenuti", false, result);
-        list.remove("topolino");
-        list.remove("pippo");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato per verificare la presenza di un sottoinsieme degli elementi", true, result);
-        list.remove("pluto");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato con una collezione vuota come parametro", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //ClassCastException non può essere lanciata per definizione
+        instance.add("paperino");
+        List param = new List();
+        param.add("pippo");
+        param.add("pippo");
+        param.add("pluto");
+        boolean result = instance.containsAll(param);
+        assertEquals("collezione che contiene più istanze del parametro", true, result);
     }
     
     /**
-     * Test of equals method, of class Set.
-     * Depends also on the correctness of method add()
+     * @title Test #1 of equals method, of class List.
+     * @description This test tests the behaviour of the method equals() when two empty lists are compared
+     * @expectedResults Two empty lists should equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance doesn't have to be directly modified by the execution of the method tested.
      */
     @Test
-    public void testEquals() {
+    public void testEquals_empty() {
+        List instance2 = new List();
+        boolean result = instance.equals(instance2);
+        assertEquals("confronto di due list vuoti", true, result);
+    }
+    
+    /**
+     * @title Test #2 of equals method, of class List.
+     * @description This test tests the behaviour of the method equals() when the two lists don't contains the same elements.
+     * @expectedResults Two empty lists should not equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testEquals_differents() {
         instance.add("pippo");
         List instance2 = new List();
         boolean result = instance.equals(instance2);
-        assertEquals("confronto di due list diverse", false, result);
-        instance2.add("pippo");
-        result = instance.equals(instance2);
+        assertEquals("confronto di due list diversi", false, result);
+    }
+    
+    /**
+     * @title Test #3 of equals method, of class List.
+     * @description This test tests the behaviour of the method equals() when the two lists contains the same elements. It's also tested that the method is simmetric.
+     * @expectedResults Two empty lists should equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testEquals_equals() {
+        instance.add("pippo");
+        List other = new List();
+        other.add("pippo");
+        boolean result = instance.equals(other);
         assertEquals("confronto di due list uguali", true, result);
-        result = instance2.equals(instance);
+        result = other.equals(instance);
         assertEquals("il confronto deve essere simmetrico", true, result);
+    }
+
+    /**
+     * @title Test #1 of hashCode method, of class List.
+     * @description This test tests the behaviour of the method hashCode() when called on an empty List. The hash of a List is defined with a specific formula in the documentation.
+     * @expectedResults The hashcode of an empty List must be 1.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashCode_empty() {
+        int result = instance.hashCode();
+        assertEquals("per definizione, l'hashcode di un list vuoto deve essere 1", 1, result);
+    }
+    
+    /**
+     * @title Test #2 of hashCode method, of class List.
+     * @description This test tests the behaviour of the method hashCode() when called on a not-empty List. The hash of a List is defined with a specific formula in the documentation.
+     * @expectedResults The hashcode of a list must equals to the result of the specified formula.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashCode_notEmpty() {
+        String elem1 = "pippo", elem2 = "pluto";
+        instance.add(elem1);
+        instance.add(elem2);
+        int result = instance.hashCode();
+        int expected = 31 + elem1.hashCode();
+        expected = expected * 31 + elem2.hashCode();
+        assertEquals("hash di un list non vuoto", expected, result);
+    }
+
+    /**
+     * @title Test of hashCode and equals methods, of class List.
+     * @description This test tests the coherence between the hashCode and equals methods. More in details, if two objects equals each other they must have the same hash. If two object has the same hash, not necessarly they equals each other.
+     * @expectedResults The equals method is expected to be coherent with the hashcode. 
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance is not directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashEquals() {
+        instance.add("pippo");
+        int hash = instance.hashCode();
+        List instance2 = new List();
+        instance2.add("pippo");
+        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
+        assertEquals("controllo coerenza hashCode ed equals", true, result);
     }
 
     /**
@@ -281,43 +358,6 @@ public class ListTest {
                 () -> {
                     instance.get(-20);
                 });
-    }
-        
-    /**
-     * Test of hashCode method, of class Set. Depends also on the correctness of
-     * method add()
-     */
-    @Test
-    public void testHashCode() {
-        int result = instance.hashCode();
-        int expected = 1;
-        assertEquals("per definizione, l'hashcode di una list vuota deve essere 1", expected, result);
-        String elem = "pippo";
-        instance.add(elem);
-        result = instance.hashCode();
-        expected = expected*31 + elem.hashCode();
-        assertEquals("controllo la correttezza dell'hashcode di una lista con un solo elemento sulla base dell'algoritmo dato", expected, result);
-        String elem2 = "pluto";
-        instance.add(elem2);
-        result = instance.hashCode();
-        expected = expected*31 + elem2.hashCode();
-        assertEquals("controllo la correttezza dell'hashcode di una lista con più elementi", expected, result);
-    
-    }
-
-    /**
-     * Test the coherence of methods hashCode() and equals(). Depends also on the
-     * correctness of method add()
-     */
-    @Test
-    public void testHashEquals() {
-        List other = new List();
-        other.add("pippo");
-        instance.add("pippo");
-        boolean result = (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
-        instance.add("pluto");
-        result = result || (instance.hashCode() == other.hashCode()) ^ instance.equals(other);
-        assertEquals("l'hashcode è coerente con il metodo equals", false, result);
     }
 
     /**
@@ -478,7 +518,7 @@ public class ListTest {
 
     /**
      * @title Test #1 of remove method, of class List.
-     * @description This test tests the behaviour of remove() method when called on a not-empty collection and the specified element is contained. More in details, it tests wheter the removed element is that one with the lowest index or not.
+     * @description This test tests the behaviour of remove() method when called on a not-empty collection and the specified element is contained. More in details, it tests wheter the removed element is that one with the lowest index or not. It also tests that the method removes only one element from the list.
      * @expectedResults The element remove is the one which has the lowest index between the equals object of the list.
      * @actualResult As expected result.
      * @dependencies Depends on the correctness of methods add(), isEmpty() and get().
@@ -490,47 +530,13 @@ public class ListTest {
         instance.add("pippo");
         instance.add("pluto");
         instance.add("pippo");
-        boolean result = instance.remove("pippo") && instance.size()==2;
+        boolean result = instance.remove("pippo");
         String[] expected = {"pluto", "pippo"};
         for(int i=0; i<2; i++) result &= instance.get(i).equals(expected[i]);
         assertEquals("verifica che, in caso di duplicati, si rimuova l'istanza con indice minore", true, result);
+        assertEquals("l'elemento rimosso deve essere solo uno", 2, instance.size());
     }
-
-    /**
-     * Test of removeAll method, of class List.
-     * Depends also on the correctness of methods add(), size() and isEmpty()
-     */
-    @Test
-    public void testRemoveAll() {
-        List list = new List();
-        list.add("pippo");
-        boolean result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
-        list.clear();
-        result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
-        instance.add("pippo");
-        result = instance.removeAll(list) && instance.size() == 1;
-        assertEquals("non rimuove alcun elemento del set", false, result);
-        list.add("pippo");
-        result = instance.removeAll(list) && instance.isEmpty();
-        assertEquals("rimuove tutti gli elementi del set", true, result);
-        instance.add("pluto");
-        instance.add("pippo");
-        result = instance.removeAll(list) && instance.size() == 1;
-        assertEquals("rimuove una parte degli elementi della lista", true, result);
-
-       //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.removeAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
-
+    
     /**
      * Test of retainAll method, of class List.
      * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()

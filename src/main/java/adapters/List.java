@@ -165,7 +165,7 @@ public class List implements HList {
         HIterator it = iterator();
         while (it.hasNext()) {
             Object obj = it.next();
-            hashCode = 31 * hashCode + (obj == null ? 0 : obj.hashCode());
+            hashCode = 31 * hashCode + obj.hashCode();
         }
         return hashCode;
     }

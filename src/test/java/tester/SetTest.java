@@ -1,6 +1,8 @@
 package tester;
 
+import adapters.List;
 import adapters.Set;
+import interfaces.HCollection;
 import interfaces.HIterator;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -33,7 +35,7 @@ public class SetTest {
      * @expectedResults The add method is expected to add only elements which aren't contained in the set yet.
      * @actualResult As expected result.
      * @dependencies Depends on the correctness of method size().
-     * @preConditions The set instance must be a new istance of List.
+     * @preConditions The set instance must be a new istance of Set.
      * @postConditions The set instance is directly modified by the execution of the method tested.
      */
     @Test
@@ -45,105 +47,228 @@ public class SetTest {
         assertEquals("elemento già contenuto nel set, non inserito", false, result);
         assertEquals("dimensione inalterata", 1, instance.size());
     }
-
+    
     /**
-     * @title Test of contains method, of class Set. Depends on the correctness of the
-     * methods add() and remove()
+     * @title Test #1 of addAll method, of class Set.
+     * @description This test tests the behaviour of the method addAll() when called using a collection which contains duplicates.
+     * @expectedResults The duplicates elementes should be added just once in the collections, as duplicates are not allowed in the set.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size() and add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has to be modified by the execution of the method tested.
      */
     @Test
-    public void testContains() {
-        String elem = "pippo";
-        boolean result = instance.contains(elem);
-        assertEquals("metodo invocato su una collezione vuota", false, result);
-        instance.add(elem);
-        result = instance.contains(elem);
-        assertEquals("metodo invocato con un parametro valido", true, result);
-        result = instance.contains("pippo");
-        assertEquals("verifica che il metodo sia basato su equals()", true, result);
-        instance.remove(elem);
-        result = instance.contains(elem);
-        assertEquals("metodo invocato con un parametro che è stato in precedenza cancellato", false, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.contains(null);
-                });
-        //ClassCastException non può essere controllata per definizione
+    public void testAddAll_duplicates() {
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pippo");
+        param.add("pluto");
+        boolean result = instance.addAll(param);
+        assertEquals("ci sono elementi nuovi, vengono aggiunti e lo stato della lista cambia", true, result);
+        assertEquals("la dimensione della collezione deve variare, ma i doppioni sono aggiunti una volta sola", 2, instance.size());
+    }
+    
+    /**
+     * @title Test #2 of addAll method, of class Set.
+     * @description This test tests the behaviour of the method addAll() when called using a collection which contains elements which are already contained in the set.
+     * @expectedResults The elementes which are already contained should be added just once in the collections, as duplicates are not allowed in the set.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods size() and add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_contained() {
+        instance.add("pippo");
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pluto");
+        boolean result = instance.addAll(param);
+        assertEquals("ci sono elementi nuovi, vengono aggiunti e lo stato della lista cambia", true, result);
+        assertEquals("la dimensione della collezione deve variare, ma gli elementi già presenti non sono aggiunti di nuovo", 2, instance.size());
     }
 
     /**
-     * @title Test of containsAll method, of class Set. 
-     * Depends on the correctness of methods add() and remove()
+     * @title Test #1 of contains method, of class Set.
+     * @description This test tests the behaviour of the method contains() when called using a parameter which is not contained in the set, but has the same hash of an element contained.
+     * @expectedResults The comparison is not performed only on the hash of the objects, return value should be false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be directly modified by the execution of the method tested.
      */
     @Test
-    public void testContainsAll() {
-        Set list = new Set();
-        boolean result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione vuota", true, result);
-        String elem1 = "pippo", elem2 = "pluto", elem3 = "topolino";
-        list.add(elem1);
-        list.add(elem2);
-        list.add(elem3);
+    public void testContains_hash() {
+        instance.add("AaAaBB");
+        boolean result = instance.contains("AaAaAa");
+        assertEquals("parametro non contenuto ma con stesso hash di uno contenuto", false, result);
+    }
+    
+    /**
+     * @title Test #1 of containsAll method, of class Set.
+     * @description This test tests the behaviour of the method containsAll() when is called using as parameter a set which contains elements whith same hash of an element of this set, but which is not contained.
+     * @expectedResults The result should be false, as this set doesn't contains all param elements (comparison by equals, not hash).
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testContainsAll_emptySet() {
+        instance.add("AaAaBB");
+        instance.add("pippo");
+        Set param = new Set();
+        param.add("AaAaAa");
+        param.add("pippo");
+        boolean result = instance.containsAll(param);
+        assertEquals("test confronto hash o equals", false, result);
+    }
+    
+    /**
+     * @title Test #1 of equals method, of class Set.
+     * @description This test tests the behaviour of the method equals() when two empty sets are compared
+     * @expectedResults Two empty sets should equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testEquals_empty() {
+        Set instance2 = new Set();
+        boolean result = instance.equals(instance2);
+        assertEquals("confronto di due set vuoti", true, result);
+    }
+    
+    /**
+     * @title Test #2 of equals method, of class Set.
+     * @description This test tests the behaviour of the method equals() when the two sets don't contains the same elements.
+     * @expectedResults Two empty sets should not equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testEquals_differents() {
+        instance.add("pippo");
+        Set instance2 = new Set();
+        boolean result = instance.equals(instance2);
+        assertEquals("confronto di due set diversi", false, result);
+    }
+    
+    /**
+     * @title Test #3 of equals method, of class Set.
+     * @description This test tests the behaviour of the method equals() when the two sets contains the same elements. It's also tested that the method is simmetric.
+     * @expectedResults Two empty sets should equals.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testEquals_equals() {
+        instance.add("pippo");
+        Set other = new Set();
+        other.add("pippo");
+        boolean result = instance.equals(other);
+        assertEquals("confronto di due set uguali", true, result);
+        result = other.equals(instance);
+        assertEquals("il confronto deve essere simmetrico", true, result);
+    }
+
+    /**
+     * @title Test #1 of hashCode method, of class Set.
+     * @description This test tests the behaviour of the method hashCode() when called on an empty Set. The hash of a Set is defined as the sum of the hashes of set elements.
+     * @expectedResults The hashcode of an empty Set must be 0.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashCode_empty() {
+        int result = instance.hashCode();
+        assertEquals("per definizione, l'hashcode di un set vuoto deve essere 0", 0, result);
+    }
+    
+    /**
+     * @title Test #2 of hashCode method, of class Set.
+     * @description This test tests the behaviour of the method hashCode() when called on a not-empty Set. The hash of a Set is defined as the sum of the hashes of set elements.
+     * @expectedResults The hashcode of a set must equals to the sum of its element hash.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashCode_notEmpty() {
+        String elem1 = "pippo", elem2 = "pluto";
+        instance.add(elem1);
+        instance.add(elem2);
+        int result = instance.hashCode();
+        int expected = elem1.hashCode() + elem2.hashCode();
+        assertEquals("hash di un set non vuoto", expected, result);
+    }
+
+    /**
+     * @title Test of hashCode and equals methods, of class Set.
+     * @description This test tests the coherence between the hashCode and equals methods. More in details, if two objects equals each other they must have the same hash. If two object has the same hash, not necessarly they equals each other.
+     * @expectedResults The equals method is expected to be coherent with the hashcode. 
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance is not directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testHashEquals() {
+        instance.add("pippo");
+        int hash = instance.hashCode();
+        Set instance2 = new Set();
+        instance2.add("pippo");
+        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
+        assertEquals("controllo coerenza hashCode ed equals", true, result);
+    }
+
+    /**
+     * @title Test #1 of removeAll method, of class Set.
+     * @description This test tests the behaviour of removeAl() method when called using as parameter a collection which has duplicates elements contained.
+     * @expectedResults The method has to remove the element the first time, and then not modify the set again the others times.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of methods add() and size().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_duplicates() {
         instance.add("pippo");
         instance.add("pluto");
-        instance.add("topolino");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione valida, verifica anche che il confronto tra elementi sia eseguito mediante il metodo equals()", true, result);
-        instance.remove("topolino");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato su una collezione valida con parametri non tutti contenuti", false, result);
-        list.remove("topolino");
-        list.remove("pippo");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato per verificare la presenza di un sottoinsieme degli elementi", true, result);
-        list.remove("pluto");
-        result = instance.containsAll(list);
-        assertEquals("metodo invocato con una collezione vuota come parametro", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //ClassCastException non può essere lanciata per definizione
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pippo");
+        boolean result = instance.removeAll(param);
+        assertEquals("la collezione è modificata, un elemento è rimosso", true, result);
+        assertEquals("la dimensione è diminuita", 1, instance.size());
     }
-
+    
     /**
-     * @title Test of addAll method, of class Set. Depends on the correcteness of the
-     * methods clear(), containAll(), add(), remove(), size(), isEmpty()
+     * @title Test #2 of removeAll method, of class Set.
+     * @description This test tests the behaviour of removeAll() method when called using as parameter a set which contains elements that have the same hash of elements contained in this set but are not contained.
+     * @expectedResults The method should not remove elements with the same hash in this set, the comparison is based on equals.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should not be modified directly by the execution of the method.
      */
     @Test
-    public void testAddAll() {
-        Set list = new Set();
-        boolean result = instance.addAll(list) || !instance.isEmpty();
-        assertEquals("aggiunta una collezione vuota, che non modifica lo stato del set", false, result);
-        instance.add("pippo");
-        list.add("pippo");
-        result = instance.addAll(list) && instance.size() == 1;
-        assertEquals("aggiunta di una collezione con elementi già presenti", false, result);
-        list.add("pluto");
-        result = instance.addAll(list) && instance.size() == 2;
-        assertEquals("aggiunta di una collezione con nuovi elementi e elementi già presenti", true, result);
-        list.clear();
-        list.add("topolino");
-        result = instance.addAll(list) && instance.size() == 3;
-        assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
-        list.add("pippo");
-        list.add("pluto");
-        result = instance.containsAll(list);
-        assertEquals("controllo che siano stati effettivamente inseriti gli elementi", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
+    public void testRemoveAll_hash() {
+        instance.add("AaAaBB");
+        instance.add("pluto");
+        HCollection param = new List();
+        param.add("AaAaAa");
+        param.add("pippo");
+        boolean result = instance.removeAll(param);
+        assertEquals("elementi con hash uguali non dovrebbero essere rimossi", false, result);
     }
 
     /**
@@ -180,42 +305,6 @@ public class SetTest {
         //ClassCastException non può essere lanciata per definizione
         //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
     }
-
-    /**
-     * @title Test of removeAll method, of class Set.
-     */
-    @Test
-    public void testRemoveAll() {
-        Set list = new Set();
-        list.add("pippo");
-        boolean result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
-        list.clear();
-        result = instance.removeAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
-        instance.add("pippo");
-        result = instance.removeAll(list) && instance.size() == 1;
-        assertEquals("non rimuove alcun elemento del set", false, result);
-        list.add("pippo");
-        result = instance.removeAll(list) && instance.isEmpty();
-        assertEquals("rimuove tutti gli elementi del set", true, result);
-        instance.add("pluto");
-        instance.add("pippo");
-        result = instance.removeAll(list) && instance.size() == 1;
-        assertEquals("rimuove una parte degli elementi della lista", true, result);
-
-       //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
-        //il caso in cui si aggiunge una collection con all'interno uno o più elementi null non può essere controllato, non dispongo di classi che accettano come elementi null
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
-
- 
 
     /**
      * @title Test of iterator method, of class Set. Depends on the correcteness of
@@ -279,55 +368,4 @@ public class SetTest {
                 });
     }
 
-    /**
-     * @title Test of equals method, of class Set.
-     * Depends on the correctness of method add()
-     */
-    @Test
-    public void testEquals() {
-        instance.add("pippo");
-        Set instance2 = new Set();
-        boolean result = instance.equals(instance2);
-        assertEquals("confronto di due set diversi", false, result);
-        instance2.add("pippo");
-        result = instance.equals(instance2);
-        assertEquals("confronto di due set uguali", true, result);
-        result = instance2.equals(instance);
-        assertEquals("il confronto deve essere simmetrico", true, result);
-    }
-
-    /**
-     * @title Test of hashCode method, of class Set.
-     * Depends on the correctness of method add()
-     */
-    @Test
-    public void testHashCode() {
-        int result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di un set vuoto deve essere 0", 0, result);
-        String elem = "pippo";
-        instance.add(elem);
-        result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di un set con un elemento deve essere uguale all'hashcode dell'elemento", elem.hashCode(), result);
-        String elem2 = "pluto";
-        instance.add(elem2);
-        result = instance.hashCode();
-        assertEquals("per definizione, l'hashcode di un set con più elementi deve essere uguale alla somma degli hash dei suoi elementi", elem.hashCode() + elem2.hashCode(), result);
-    }
-
-    /**
-     * Test the coherence of methods hashCode() and equals().
-     * Depends on the correctness of method add()
-     */
-    @Test
-    public void testHashEquals() {
-        instance.add("pippo");
-        int hash = instance.hashCode();
-        Set instance2 = new Set();
-        instance2.add("pippo");
-        boolean result = (hash == instance2.hashCode()) && instance.equals(instance2);
-        assertEquals("confronto di due set diversi", true, result);
-    }
-        
-    
-    
 }

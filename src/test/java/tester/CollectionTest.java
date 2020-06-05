@@ -1,5 +1,7 @@
 package tester;
 
+import adapters.List;
+import adapters.Set;
 import interfaces.HCollection;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -15,8 +17,9 @@ import org.junit.runners.MethodSorters;
 import org.junit.runners.Parameterized;
 
 /**
- * Test suite for testing the behaviour of List and Set implementation as Collections.
- * This test suite is a parameterized suite which use reflection to test the common behaviour between List and Set defined by Collection interface.
+ * Test suite for testing the behaviour of classes which, directly or not, implements the interface Collection.
+ * This test suite is a parameterized suite which use reflection to test the common behaviour defined by Collection interface on instances of classes which implements that interface, directly or not.
+ * More specific behaviours which are defined by subinterfaces of the interface Collection are tested by other specialized test suites.
  * @author Giacomo Camposampiero
  */
 @RunWith(Parameterized.class)
@@ -48,7 +51,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #1 of add method, of an istance of Collection interface.
+     * @title Test #1 of add method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method add() when called on an empty collection.
      * @expectedResults Adding an element to an empty list (as it has just been istantiated) must be always possible.
      * @actualResult As expected result.
@@ -64,7 +67,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #2 of add method, of an istance of Collection interface.
+     * @title Test #2 of add method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method add() when called on a not-empty collection.
      * @expectedResults Adding an element which is not contained in the collection should be always possible.
      * @actualResult As expected result.
@@ -81,7 +84,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #3 of add method, of an istance of Collection interface.
+     * @title Test #3 of add method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method add() when called on a collection using a null parameter.
      * @expectedResults The class is expected to throw a NullPointerException when a null reference is used in the add method.
      * @actualResult As expected result.
@@ -98,7 +101,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test of miscellaneous of methods, of an istance of Collection interface.
+     * @title Test of a miscellaneous of methods, on an instance of a class which implements Collection interface.
      * @description This test tests a complexe burst of add and remove operations. Coherence with methods size() and isEmpty() is tested too.
      * @expectedResults The sequence of operations succeed.
      * @actualResult As expected result.
@@ -115,7 +118,7 @@ public class CollectionTest {
         assertEquals("controllo validità metodo isEmpty()", false, instance.isEmpty());
         result = instance.remove("pippo");
         result |= instance.remove("pluto");
-        assertEquals("rimozioni riuscite", false, result);
+        assertEquals("rimozioni riuscite", true, result);
         assertEquals("controllo validità metodo size()", 0, instance.size());
         assertEquals("controllo validità metodo isEmpty()", true, instance.isEmpty());
         result = instance.add("pippo");
@@ -125,7 +128,79 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #1 of clear method, of an istance of Collection interface.
+     * @title Test #1 of addAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method addAll() when called on an empty collection using an empty collection.
+     * @expectedResults Nothing shoud be added to the collection, which should remain empty. 
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method isEmpty().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has not to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_bothEmpty() {
+        HCollection param = new List();
+        boolean result = instance.addAll(param);
+        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della collezione", false, result);
+        assertEquals("la dimensione della collezione non deve variare", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #2 of addAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method addAll() when called on a not-empty collection using an empty collection.
+     * @expectedResults Nothing shoud be added to the collection. 
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has not to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_emptyParam() {
+        instance.add("pippo");
+        HCollection param = new Set();
+        boolean result = instance.addAll(param);
+        assertEquals("aggiunta una collezione vuota, che non modifica lo stato della collezione", false, result);
+        assertEquals("la dimensione della collezione non deve variare", 1, instance.size());
+    }
+    
+    /**
+     * @title Test #3 of addAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method addAll() when called using parameters which are not contained in the collection.
+     * @expectedResults All the elements contained in the parametric collection should be added to the list. 
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of metohods add() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_notContained() {
+        HCollection param = new List();
+        instance.add("pippo");
+        param.add("pluto");
+        param.add("topolino");
+        boolean result = instance.addAll(param);
+        assertEquals("aggiunta di una collezione con soli nuovi elementi", true, result);
+        assertEquals("controllo dimensione", 3, instance.size());
+    }
+    
+    /**
+     * @title Test #4 of addAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method addAll() when called using null reference. The behavioiur of the method when a collection which contains null elements is used as parameter cannot be tested, as we do not have collections which accept null elements.
+     * @expectedResults The object is expected to throw a NullPointerException. 
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other class methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance has not to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testAddAll_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.containsAll(null);
+                });
+    }
+    
+    /**
+     * @title Test #1 of clear method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method clear() when called on an empty collection.
      * @expectedResults A just instancied collection is expected to be empty, should be still empty after the invocation of the method.
      * @actualResult As expected result.
@@ -141,7 +216,7 @@ public class CollectionTest {
     }    
      
     /**
-     * @title Test #2 of clear method, of an istance of Collection interface.
+     * @title Test #2 of clear method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method clear() when called on a not-empty collection.
      * @expectedResults The collection is expected to be empty after invocation of the method.
      * @actualResult As expected result.
@@ -159,7 +234,229 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #1 of isEmpty method, of an istance of Collection interface.
+     * @title Test #1 of contains method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method contains() when called on an empty collection
+     * @expectedResults A just instancied collection is expected not to contain any element.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testContains_empty() {
+        boolean result = instance.contains("pippo");
+        assertEquals("metodo invocato su una collezione vuota", false, result);
+    }
+    
+    /**
+     * @title Test #2 of contains method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method contains() when called on a not-empty collection which not contains the parameter.
+     * @expectedResults The collection does not contain the parameter, so the expected result is false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testContains_notContained() {
+        instance.add("pippo");
+        boolean result = instance.contains("pluto");
+        assertEquals("elemento non contenuto", false, result);
+    }
+    
+    /**
+     * @title Test #3 of contains method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method contains() when called on a not-empty collection which contains the parameter.
+     * @expectedResults The collection does not contain the parameter, so the expected result is true.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified directly by the execution of the method tested.
+     */
+    @Test
+    public void testContains_contained() {
+        instance.add("pippo");
+        boolean result = instance.contains("pippo");
+        assertEquals("elemento contenuto nella collection", true, result);
+    }
+    
+    /**
+     * @title Test #4 of contains method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method contains() when called on a not-empty collection where the parameter was removed right before the invocation of the method. Tests the coherence between remove and contains.
+     * @expectedResults The collection no longer contains the parameter, so the expected result is false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method add() and remove().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testContains_removed() {
+        instance.add("pippo");
+        instance.remove("pippo");
+        boolean result = instance.contains("pippo");
+        assertEquals("metodo invocato con un parametro che è stato in precedenza cancellato", false, result);
+    }
+    
+    /**
+     * @title Test #5 of contains method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method contains() when called using a null reference.
+     * @expectedResults The collection is expected to throw a NullPointerException as does not support null elements.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
+     */
+    @Test
+    public void testContains_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.contains(null);
+                });
+    }
+    
+    /**
+     * @title Test #1 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on an empty collection using an empty Set parameter.
+     * @expectedResults The instance should contains all elements of the parameter, because it's empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testContainsAll_emptySet() {
+        HCollection param = new Set();
+        boolean result = instance.containsAll(param);
+        assertEquals("metodo invocato su una collezione vuota", true, result);
+    }
+    
+    /**
+     * @title Test #2 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on an empty collection using an empty List parameter.
+     * @expectedResults The instance should contains all elements of the parameter, because it's empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test
+    public void testContainsAll_emptyList() {
+        HCollection param = new List();
+        boolean result = instance.containsAll(param);
+        assertEquals("metodo invocato su una collezione vuota", true, result);
+    }
+    
+    /**
+     * @title Test #3 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on a not-empty collection which not contains any of the elements contained in the Set param.
+     * @expectedResults The collection should not contain any of the parameter elements, the result should be false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_notContainedSet() {
+        HCollection param = new Set();
+        param.add("pippo");
+        param.add("pluto");
+        param.add("paperino");
+        instance.add("asso");
+        boolean result = instance.containsAll(param);
+        assertEquals("elementi tutti non presenti", false, result);
+    }
+    /**
+     * @title Test #4 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on a not-empty collection which not contains any of the elements contained in the List param.
+     * @expectedResults The collection should not contain any of the parameter elements, the result should be false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness ofadd().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_notContainedList() {
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pluto");
+        param.add("paperino");
+        instance.add("asso");
+        boolean result = instance.containsAll(param);
+        assertEquals("elementi tutti non presenti", false, result);
+    }
+    
+    /**
+     * @title Test #5 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on a not-empty collection which contains any of the elements contained in the param.
+     * @expectedResults The collection should contain all the parameter elements, the result should be true.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_containedParam() {
+        HCollection param = new List();
+        instance.add("pluto");
+        instance.add("topolino");
+        instance.add("asso");
+        param.add("pluto");
+        param.add("topolino");
+        boolean result = instance.containsAll(param);
+        assertEquals("collezione contiene tutti i parametri", true, result);
+    }
+    
+    /**
+     * @title Test #6 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on a not-empty collection which contains just few of the elements contained in the param.
+     * @expectedResults The collection should not contain all the parameter elements, the result should be false.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_partiallyContainedParam() {
+        HCollection param = new Set();
+        param.add("topolino");
+        param.add("pippo");
+        param.add("pluto");
+        instance.add("topolino");
+        instance.add("pippo");
+        boolean result = instance.containsAll(param);
+        assertEquals("collezione contiene solo parte dei parametri", false, result);
+    }
+    
+    /**
+     * @title Test #7 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called on a not-empty collection using an empty param.
+     * @expectedResults The collection should contain all the parameter elements, as the param is empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_emptyParam() {
+        HCollection param = new Set();
+        instance.add("pluto");
+        boolean result = instance.containsAll(param);
+        assertEquals("metodo invocato con una collezione vuota come parametro", true, result);
+    }
+    
+    /**
+     * @title Test #8 of containsAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the method containsAll() when called using a null reference. The case of call of the method using a collection which contains a null reference as element cannot be tested, as there are no collection implementations which supports null elements.
+     * @expectedResults A NullPointerException is expected as result of the call of the method.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method of the class.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
+     */
+    public void testContainsAll_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.containsAll(null);
+                });
+    }
+    
+    /**
+     * @title Test #1 of isEmpty method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method isEmpty() when called on an empty collection
      * @expectedResults A just instancied collection is expected to be empty.
      * @actualResult As expected result.
@@ -174,7 +471,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #2 of isEmpty method, of an istance of Collection interface.
+     * @title Test #2 of isEmpty method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the method isEmpty() when called on an empty Collection.
      * @expectedResults An element was added to the collection, the collection should not be empty.
      * @actualResult As expected result.
@@ -190,7 +487,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #3 of isEmpty method, of an istance of Collection interface.
+     * @title Test #3 of isEmpty method, of an istance of a class which implements Collection interface.
      * @description This test tests the coherence between methods size() and isEmpty().
      * @expectedResults A coherent behaviour is expected between size() and isEmpty() methods.
      * @actualResult As expected result.
@@ -210,7 +507,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #1 of size method, of an istance of Collection interface.
+     * @title Test #1 of size method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of size() method when called on an empty collection.
      * @expectedResults The size is expected to be zero, as the collection is empty.
      * @actualResult As expected result.
@@ -225,7 +522,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #2 of size method, of an istance of Collection interface.
+     * @title Test #2 of size method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of size() method when called on a non-empty collection.
      * @expectedResults The size is expected to be equal to the number of elements that have been added to thecollection.
      * @actualResult As expected result.
@@ -241,7 +538,7 @@ public class CollectionTest {
     }    
     
     /**
-     * @title Test #1 of remove method, of an istance of Collection interface.
+     * @title Test #1 of remove method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of remove() method when called on an empty collection.
      * @expectedResults The collection is empty, the remove() must return false.
      * @actualResult As expected result.
@@ -256,7 +553,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #2 of remove method, of an istance of Collection interface.
+     * @title Test #2 of remove method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of remove() method when called on a not-empty collection and the specified element is not contained.
      * @expectedResults Specified element is not contained in the collection, the remove must return false.
      * @actualResult As expected result.
@@ -272,7 +569,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #3 of remove method, of an istance of Collection interface.
+     * @title Test #3 of remove method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of remove() method when called on a not-empty collection and the specified element is contained.
      * @expectedResults Specified element is contained in the collection, the remove must return true and remove the element.
      * @actualResult As expected result.
@@ -290,7 +587,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #4 of remove method, of an istance of Collection interface.
+     * @title Test #4 of remove method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of remove() method when called using a null reference as parameter.
      * @expectedResults The method is expected to throw a NullPointerException as null elements are not supported by this collection.
      * @actualResult As expected result.
@@ -307,7 +604,101 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #1 of toArray method, of an istance of Collection interface.
+     * @title Test #1 of removeAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of removeAll() method when called on an empty collection using an empty collection as parameter.
+     * @expectedResults The method must return false, as the collection is not changed by the invocation of the method.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_bothEmpty() {
+        HCollection param = new Set();
+        boolean result = instance.removeAll(param);
+        assertEquals("removeAll invocato su collezione vuota", false, result);
+    }
+    
+    /**
+     * @title Test #2 of removeAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of removeAll() method when called on a not-empty collection using an empty collection as parameter.
+     * @expectedResults The method must return false, as the collection is not changed by the invocation of the method.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctnes of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_emptyParam() {
+        HCollection param = new List();
+        instance.add("pippo");
+        boolean result = instance.removeAll(param);
+        assertEquals("metodo invocato su collezione piena con parametro vuoto", false, result);
+    }
+    
+    /**
+     * @title Test #3 of removeAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of removeAll() method when called on a not-empty collection using a collection which contains elements which are both contained and not in the collection.
+     * @expectedResults The method must return true, as some of the elements of the collection are removed and the collection state is changed.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctnes of method add() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_contained() {
+        instance.add("pippo");
+        instance.add("pluto");
+        HCollection param = new Set();
+        param.add("pippo");
+        param.add("paperino");
+        boolean result = instance.removeAll(param);
+        assertEquals("dalla collezione sono rimossi alcuni elementi", true, result);
+        assertEquals("la dimensione della collezione è diminuita", 1, instance.size());
+    }
+    
+    /**
+     * @title Test #4 of removeAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of removeAll() method when called on a not-empty collection using a collection which contains all the elements of the collection.
+     * @expectedResults All the collection elements are removed from the collection.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctnes of method add() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_all() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("pluto");
+        param.add("topolino");
+        boolean res = instance.removeAll(param);
+        assertEquals("è avvenuta una rimozione", true, res);
+        assertEquals("la lista è vuota a seguito delle rimozioni", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #5 of removeAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of removeAll() method when called using a null reference as parameter.
+     * @expectedResults The collection is expected to throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctnes of other methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRemoveAll_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.removeAll(null);
+                });
+    }
+    
+    /**
+     * @title Test #1 of toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of toArray() method when called on an empty collection.
      * @expectedResults The returned array must be an empty array, as the instance is empty.
      * @actualResult As expected result.
@@ -323,7 +714,7 @@ public class CollectionTest {
     }    
         
     /**
-     * @title Test #2 of toArray method, of an istance of Collection interface.
+     * @title Test #2 of toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of toArray() method when called on a non-empty collection.
      * @expectedResults The returned array must be aa generic Object[] array, its size has to be equal to the instance size and it must contains all the elements of the original array.
      * @actualResult As expected result.
@@ -346,7 +737,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #3 of toArray method, of an istance of Collection interface.
+     * @title Test #3 of toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests that the returned array is safe, no reference are mantained to the main collection.
      * @expectedResults The returned array can be modified without causing any structural modification to the collection.
      * @actualResult As expected result.
@@ -366,7 +757,7 @@ public class CollectionTest {
     }
        
     /**
-     * @title Test #1 of parametric toArray method, of an istance of Collection interface.
+     * @title Test #1 of parametric toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the parametric toArray() when an empty array is used as parameter and the collection is empty.
      * @expectedResults The array returned should be exactly the one which has been passed as parameter, not modified at all.
      * @actualResult As expected result.
@@ -383,7 +774,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #2 of parametric toArray method, of an istance of Collection interface.
+     * @title Test #2 of parametric toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of the parametric toArray() when a not-empty array is used as parameter and thecollection is empty. This method test also wheter the method modify the only the firstcollection.size() cells of the param array.
      * @expectedResults The array returned should be exactly the one which has been passed as parameter, but the firstcollection.size() cells must contains the elements of the collection.
      * @actualResult As expected result.
@@ -401,7 +792,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #3 of parametric toArray method, of an istance of Collection interface.
+     * @title Test #3 of parametric toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty collection passing a not-empty array which length is greater than collection size.
      * @expectedResults The array returned should be exactly the one which has been passed as parameter, but the first size() must be modified, as they should contains the elements of this collection. The elements contained in the array in positions >= size() should not be modified.
      * @actualResult As expected result.
@@ -430,7 +821,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #4 of parametric toArray method, of an istance of Collection interface.
+     * @title Test #4 of parametric toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of parametric method toArray() when is called on a not-empty collection using an array which is not big enough to contain the whole collection.
      * @expectedResults The array returned should be a new istance of a generic Object array (the parameter should not be modified), and it should contains all the elements contained in the collection.
      * @actualResult As expected result.
@@ -458,7 +849,7 @@ public class CollectionTest {
     }
     
     /**
-     * @title Test #5 of parametric toArray method, of an istance of Collection interface.
+     * @title Test #5 of parametric toArray method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of parametric toArray() method when a null reference is used as parameter.
      * @expectedResults A NullPointerException was thrown as result of the call.
      * @actualResult As expected result.
