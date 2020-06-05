@@ -3,9 +3,11 @@ package tester;
 import adapters.List;
 import adapters.Set;
 import interfaces.HCollection;
+import interfaces.HIterator;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -38,15 +40,27 @@ public class CollectionTest {
         return Arrays.asList(new Object[][]{
             {"List"},
             {"Set"},
+            {"SubList"}
         });
     }
     
     @Before
     public void initialize() {
-        try {
-            instance = (HCollection) Class.forName("adapters."+paramClass).getConstructor().newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException  ex) {
-            System.exit(1);
+        if(paramClass.equals("SubList")) {
+            List tmp = new List();
+            tmp.add("pippo");
+            tmp.add("pluto");
+            tmp.add("paperino");
+            tmp.add("topolino");
+            tmp.add("asso");
+            tmp.add("minnie");
+            instance = tmp.subList(1, 5);
+        } else {
+            try {
+                instance = (HCollection) Class.forName("adapters."+paramClass).getConstructor().newInstance();
+            } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException  ex) {
+                System.exit(1);
+            }
         }
     }
     
@@ -507,6 +521,151 @@ public class CollectionTest {
     }
     
     /**
+     * @title Test #1 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, this test tests that an iterator of an empty collection has no next elements.
+     * @expectedResults The iterator of an empty collection can't have a next element, as the collection is empty.
+     * @actualResult As expected result.
+     * @dependencies This test has no dependencies on other class methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_empty() {
+        HIterator it = instance.iterator();
+        boolean result = it.hasNext();
+        assertEquals("iteratore di una collezione vuota non deve avere un next", false, result);
+    }
+    
+    /**
+     * @title Test #2 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, this test tests the behaviour of the iterator of a collection which has just an element.
+     * @expectedResults The iterator of a collection which has just an element should have just an element, equal to the element of the list.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_oneElement() {
+        instance.add("pippo");
+        HIterator it = instance.iterator();
+        boolean result = it.hasNext();
+        assertEquals("iteratore di una collezione piena deve avere un next", true, result);
+        result = it.next().equals("pippo");
+        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello presente nella lista", true, result);
+        result = it.hasNext();
+        assertEquals("iteratore al termine della collezione, non deve avere next", false, result);
+    }
+    
+    /**
+     * @title Test #3 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, this test tests the behaviour of the iterator and the collection when the remove method is called. The test is performed on a collection which contains just one element, so the collection should be empty at the end of the test.
+     * @expectedResults The iterator should remove the element and the collection should be empty.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add() and isEmpty().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_remove() {
+        instance.add("pippo");
+        HIterator it = instance.iterator();
+        it.next();
+        it.remove();
+        assertEquals("la rimozione è stata fatta, la collezione dovrebbe essere vuota", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #4 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, this test tests that all the elements of a collection are iterable by the iterator. 
+     * @expectedResults The iterator should be able to iterate all the elements of the collection.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of methods add(), contains() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_iteration() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        HIterator it = instance.iterator();
+        boolean result = true;
+        int i = 0;
+        while (it.hasNext()) {
+            result = result && instance.contains(it.next());
+            i++;
+        }
+        result = result && instance.size() == i;
+        assertEquals("la lista contiene tutti gli elementi contenuti nell'iteratore", true, result);
+    }
+    
+    /**
+     * @title Test #5 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, this test tests a complex sequence of operation with the iterator. 
+     * @expectedResults The result of a sequence of operation performed by the iterator should be consistent and the changes should be correctly reflected to the map.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_complex() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        instance.add("paperino");
+        instance.add("rame");
+        instance.add("argon");
+        HIterator it = instance.iterator();
+        it.next();
+        it.remove();
+        assertEquals("dimensione diminuita", 5, instance.size());
+        it.next();
+        it.next();
+        it.remove();
+        assertEquals("dimensione diminuita", 4, instance.size());
+        it.next();
+        it.next();
+        it.remove();
+        assertEquals("dimensione diminuita", 3, instance.size());
+        it.next();
+        it.remove();
+        assertEquals("dimensione diminuita", 2, instance.size());
+        assertEquals("fine iteratore raggiunta", false, it.hasNext());
+    }
+    
+    /**
+     * @title Test #6 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, the trowing of expected exceptions is tested: NoSuchElementException if next() is called but hasNext() is false; IllegalStateException if remove() is called before next() or if remove() is called another remove() without performing a next() before.
+     * @expectedResults The expected exceptions should be thrown in the conditions listed above.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testIterator_exceptions() {
+        assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
+                () -> {
+                    instance.iterator().next();
+                });
+        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
+                () -> {
+                    instance.add("pippo");
+                    instance.iterator().remove();
+                });
+        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
+                () -> {
+                    instance.add("pippo");
+                    HIterator iter = instance.iterator();
+                    iter.next();
+                    iter.remove();
+                    iter.remove();
+                });
+    }
+    
+    /**
      * @title Test #1 of size method, of an istance of a class which implements Collection interface.
      * @description This test tests the behaviour of size() method when called on an empty collection.
      * @expectedResults The size is expected to be zero, as the collection is empty.
@@ -694,6 +853,125 @@ public class CollectionTest {
         assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
                 () -> {
                     instance.removeAll(null);
+                });
+    }
+    
+    /**
+     * @title Test #1 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called on an empty collection using an empty collection as parameter.
+     * @expectedResults The collection should not be modified by the method, as is already empty.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependencies on other class methods.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified directly by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_bothEmpty() {
+        HCollection param = new Set();
+        boolean result = instance.retainAll(param);
+        assertEquals("metodo invocato su collezione vuota, non modifica la collezione", false, result);
+    }
+    
+    /**
+     * @title Test #2 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called on a not-empty collection using an empty collection as parameter.
+     * @expectedResults All the elements of the collection must be removed from the collection.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependes on the correctness of methods add() and isEmpty.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be directly modified by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_emptyParam() {
+        HCollection param = new List();
+        instance.add("pippo");
+        instance.add("pluto");
+        boolean result = instance.retainAll(param);
+        assertEquals("metodo invocato su lista con parametro vuoto", true, result);
+        assertEquals("nessun elemento rimasto", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #3 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called on a not-empty collection using a collection of elements which are both contained and not in the collection.
+     * @expectedResults Only the elements of the parameter contained in the collection should be mantained inside it.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependes on the correctness of methods add() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be directly modified by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_variousParam() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        HCollection param = new Set();
+        param.add("pluto");
+        param.add("asso");
+        boolean result = instance.retainAll(param);
+        assertEquals("trattiene una parte degli elementi della lista", true, result);
+        assertEquals("la dimensione è cambiata", 1, instance.size());
+    }
+    
+    /**
+     * @title Test #4 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called on a not-empty collection using a collection which contains all the elements of this collection.
+     * @expectedResults All the elements of the collection should be mantained.
+     * @actualResult As expected result.
+     * @dependencies This test has no correctness dependes on the correctness of methods add() and size().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be directly modified by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_all() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        HCollection param = new Set();
+        param.add("pippo");
+        param.add("pluto");
+        param.add("topolino");
+        boolean result = instance.retainAll(param);
+        assertEquals("trattiene tutti gli elementi della lista", false, result);
+        assertEquals("la dimensione non è cambiata", 3, instance.size());
+    }
+    
+    /**
+     * @title Test #5 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called on a not-empty collection using a collection which has no element in common with the collection.
+     * @expectedResults No elemenent should be mantained in the collection.
+     * @actualResult As expected result.
+     * @dependencies This test correctness dependes on the correctness of methods add() and isEmpty().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be directly modified by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_notContained() {
+        instance.add("pippo");
+        instance.add("pluto");
+        instance.add("topolino");
+        HCollection param = new Set();
+        param.add("paperino");
+        param.add("asso");
+        boolean result = instance.retainAll(param);
+        assertEquals("trattiene tutti gli elementi della lista", true, result);
+        assertEquals("la collezione ora è vuota", true, instance.isEmpty());
+    }
+    
+    /**
+     * @title Test #6 of retainAll method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of retainAll() method when called using a null reference as parameter. The case of a param which is not null but contains null references as elements cannot be tested, as no collections which accept are available.
+     * @expectedResults The class is expected to throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies This test correctness does not depends on the correctness of any other method.
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should be directly modified by the execution of the method.
+     */
+    @Test
+    public void testRetainAll_exceptions() {
+        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
+                () -> {
+                    instance.retainAll(null);
                 });
     }
     

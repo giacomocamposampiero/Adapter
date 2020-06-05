@@ -25,14 +25,6 @@ public class Set implements HSet{
         this.table = new Hashtable(initialCapacity);
     }
     
-    public Set(Set other) {
-        this.table = new Hashtable();
-        HIterator it = other.iterator();
-        while(it.hasNext()) {
-            table.put(it.next(), 1);
-        }
-    }
-    
     /**
      * Adds the specified element to this set if it is not already present.
      * More formally, adds the specified element, o, to this set if this set contains no element e such that (o==null ? e==null : o.equals(e)). If this set already contains the specified element, the call leaves this set unchanged and returns false. In combination with the restriction on constructors, this ensures that sets never contain duplicate elements.
@@ -44,8 +36,8 @@ public class Set implements HSet{
      */
     @Override
     public boolean add(Object o) {
-        if(table.containsKey(o)) return false;
-        table.put(o, 1);
+        if(contains(o)) return false;
+        table.put(o.hashCode(), o);
         return true;
     }
 
@@ -62,9 +54,8 @@ public class Set implements HSet{
     public boolean addAll(HCollection c) {
         HIterator it = c.iterator();
         boolean res = false;
-        while(it.hasNext()){
+        while(it.hasNext()) 
             res = add(it.next()) || res;
-        }
         return res;
     }
 
@@ -86,7 +77,9 @@ public class Set implements HSet{
      */
     @Override
     public boolean contains(Object o) {
-        return table.containsKey(o);
+        int hash = o.hashCode();
+        if(!table.containsKey(hash)) return false;
+        return o.equals(table.get(hash));
     }
 
     /**
@@ -101,9 +94,8 @@ public class Set implements HSet{
     public boolean containsAll(HCollection c) {
         HIterator it = c.iterator();
         boolean res = true;
-        while(it.hasNext()){
+        while(it.hasNext())
             res = contains(it.next()) && res;
-        }
         return res;
     }
 
@@ -115,18 +107,16 @@ public class Set implements HSet{
      */
     @Override 
     public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        } 
-        if (!(o.getClass().equals(this.getClass()))){
-            return false;
-        }  
+        if (o == this) return true; 
+        if (!(o.getClass().equals(this.getClass()))) { 
+            return false; 
+        }    
         Set other = (Set) o;
         if (other.size() != size()) return false;
         HIterator it = iterator();
-        while(it.hasNext()) {
-            if(!other.contains(it.next())) return false;
-        }
+        while(it.hasNext())
+            if(!other.contains(it.next())) 
+                return false;
         return true;
     }
     
@@ -139,7 +129,7 @@ public class Set implements HSet{
     public int hashCode() {
         int hash = 0;
         HIterator it = iterator();
-        while(it.hasNext())
+        while(it.hasNext()) 
             hash += it.next().hashCode();
         return hash;
     }
@@ -173,7 +163,7 @@ public class Set implements HSet{
     @Override
     public boolean remove(Object o) {
         if(!contains(o)) return false;
-        table.remove(o);
+        table.remove(o.hashCode());
         return true;
     }
 
@@ -189,9 +179,8 @@ public class Set implements HSet{
     public boolean removeAll(HCollection c) {
         HIterator it = c.iterator();
         boolean res = false;
-        while(it.hasNext()){
+        while(it.hasNext())
             res = remove(it.next()) || res;
-        }
         return res;
     }
 
@@ -205,13 +194,14 @@ public class Set implements HSet{
      */
     @Override
     public boolean retainAll(HCollection c) {
-        boolean res = false;
+        if(c == null) throw new NullPointerException();
+        List toRemove = new List();
         HIterator it = iterator();
         while(it.hasNext()) {
             Object elem = it.next();
-            if(!c.contains(elem)) res = remove(elem) || res;
+            if(!c.contains(elem)) toRemove.add(elem);
         }
-        return res;
+        return removeAll(toRemove); 
     }
     
     /**
@@ -232,7 +222,8 @@ public class Set implements HSet{
         Object[] res = new Object[size()];
         HIterator it = iterator();
         int i = 0;
-        while(it.hasNext()) res[i++] = it.next();
+        while(it.hasNext()) 
+            res[i++] = it.next();
         return res;
     }
 
@@ -264,31 +255,31 @@ public class Set implements HSet{
     
     class SetIterator implements HIterator {
         
-        Object currentElem;
-        Enumeration elems;
+        Object currentKey;
+        Enumeration keys;
         
         public SetIterator() {
-            currentElem = null;
-            elems = table.keys();
+            currentKey = null;
+            keys = table.keys();
         }
         
         @Override
         public boolean hasNext() {
-            return elems.hasMoreElements();
+            return keys.hasMoreElements();
         }
 
         @Override
         public Object next() {
             if(!hasNext()) throw new NoSuchElementException();   
-            currentElem = elems.nextElement();
-            return currentElem;
+            currentKey = keys.nextElement();
+            return table.get(currentKey);
         }
 
         @Override
         public void remove() {
-            if(currentElem == null) throw new IllegalStateException();
-            table.remove(currentElem);
-            currentElem = null;
+            if(currentKey == null) throw new IllegalStateException();
+            table.remove(currentKey);
+            currentKey = null;
         }
         
     }

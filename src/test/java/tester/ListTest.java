@@ -388,67 +388,6 @@ public class ListTest {
     }
 
     /**
-     * Test of iterator method, of class List.
-     */
-    @Test
-    public void testIterator() {
-        HIterator it = instance.iterator();
-        boolean result = it.hasNext();
-        assertEquals("iteratore di una collezione vuota non deve avere un next", false, result);
-        instance.add("pippo");
-        it = instance.iterator();
-        result = it.hasNext();
-        assertEquals("iteratore di una collezione piena deve avere un next", true, result);
-        result = it.next().equals("pippo");
-        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello nella lista", true, result);
-        result = it.hasNext();
-        assertEquals("iteratore al termine della collezione, non deve avere next", false, result);
-        instance.add("pippo");
-        instance.add("pluto");
-        instance.add("topolino");
-        it = instance.iterator();
-        result = true;
-        int i = 0;
-        while (it.hasNext()) {
-            result = result && instance.contains(it.next());
-            i++;
-        }
-        result = result && instance.size() == i;
-        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
-        
-        instance.clear();
-        instance.add("pippo");
-        instance.add("pluto");
-        it = instance.iterator();
-        Object o = it.next();
-        it.remove();
-        result = (instance.size() == 1) && !instance.contains(o);
-        assertEquals("il metodo remove rimuove correttamente l'oggetto appena restituito dal next", true, result);
-                
-        //controllo eccezioni
-        assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
-                () -> {
-                    instance.clear();
-                    instance.iterator().next();
-                });
-        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.clear();
-                    instance.add("pippo");
-                    instance.iterator().remove();
-                });
-        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.clear();
-                    instance.add("pippo");
-                    HIterator iter = instance.iterator();
-                    iter.next();
-                    iter.remove();
-                    iter.remove();
-                });
-    }
-
-    /**
      * Test of lastIndexOf method, of class List.
      * Depends also on the correctness of method add()
      */
@@ -526,7 +465,7 @@ public class ListTest {
      * @postConditions The collection instance should be modified directly by the execution of the method.
      */
     @Test
-    public void testRemove_Object() {
+    public void testRemove() {
         instance.add("pippo");
         instance.add("pluto");
         instance.add("pippo");
@@ -538,40 +477,28 @@ public class ListTest {
     }
     
     /**
-     * Test of retainAll method, of class List.
-     * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
+     * @title Test #1 of retainAll method, of Class list.
+     * @description This test tests the behaviour of retainAll() method when called on a collection which has multiple istances of an element contained in the param.
+     * @expectedResults All the instances of the object should be mantained in the collection.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test depends on the correctness of methods add() and size().
+     * @preConditions The list instance must be a new istance of Collection.
+     * @postConditions The list instance should be directly modified  by the execution of the method.
      */
     @Test
-    public void testRetainAll() {
-        List list = new List();
-        list.add("pippo");
-        boolean result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
-        list.clear();
-        result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
-        instance.add("pippo");
-        result = instance.retainAll(list) && instance.isEmpty();
-        assertEquals("non trattiene nessun elemento", true, result);
-        instance.add("pippo");
-        list.add("pippo");
-        result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene tutti gli elementi della lista", false, result);
+    public void testRetainAll_duplicates() {    
+        instance.add("asso");
         instance.add("pluto");
-        result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene una parte degli elementi della lista", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.retainAll(null);
-                });
-        //NullPointerException non viene lanciata se la collezione contiene un elemento null, non crea problemi
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
+        instance.add("pluto");
+        instance.add("pluto");
+        HCollection param = new List();
+        param.add("pluto");
+        param.add("asso");
+        boolean result = instance.retainAll(param);
+        assertEquals("tutti gli elementi devono essere mantenuti", false, result);
+        assertEquals("la dimensione non deve variare", 4, instance.size());
     }
-
+    
     /**
      * Test of set method, of class List.
      * Depends also on the correctness of methods add() and get()

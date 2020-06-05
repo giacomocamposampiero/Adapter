@@ -4,7 +4,6 @@ import adapters.List;
 import adapters.Set;
 import interfaces.HCollection;
 import interfaces.HIterator;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -270,102 +269,26 @@ public class SetTest {
         boolean result = instance.removeAll(param);
         assertEquals("elementi con hash uguali non dovrebbero essere rimossi", false, result);
     }
-
+    
     /**
-     * @title Test of retainAll method, of class Set. 
-     * Depends on the correctness of methods add(), clear(), isEmpty(), remove(), size()
+     * @title Test #1 of retainAll method, of class Set.
+     * @description This test tests the behaviour of retainAll() method when called using as parameter a set which contains elements that have the same hash of elements contained in this set but are not contained.
+     * @expectedResults The method should not mantain elements with the same hash in this set, the comparison is based on equals.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of methods add() and size().
+     * @preConditions The set instance must be a new istance of Set.
+     * @postConditions The set instance should be modified directly by the execution of the method.
      */
     @Test
-    public void testRetainAll() {
-        Set list = new Set();
-        list.add("pippo");
-        boolean result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota", false, result);
-        list.clear();
-        result = instance.retainAll(list);
-        assertEquals("metodo invocato su lista vuota con parametro vuoto", false, result);
-        instance.add("pippo");
-        result = instance.retainAll(list) && instance.isEmpty();
-        assertEquals("non trattiene nessun elemento", true, result);
-        instance.add("pippo");
-        list.add("pippo");
-        result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene tutti gli elementi della lista", false, result);
+    public void testRetainAll_hash() {
+        instance.add("AaAaBB");
         instance.add("pluto");
-        result = instance.retainAll(list) && instance.size() == 1;
-        assertEquals("trattiene una parte degli elementi della lista", true, result);
-
-        //controllo eccezioni
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.retainAll(null);
-                });
-        //NullPointerException non viene lanciata se la collezione contiene un elemento null, non crea problemi
-        //IllegalArgumentException non può essere lanciata per definizione, tutte le classi sono sottoclassi di Object
-        //ClassCastException non può essere lanciata per definizione
-        //UnsupportedOperationException non controllata testata, il metodo deve essere per forza implementarto da consegna
-    }
-
-    /**
-     * @title Test of iterator method, of class Set. Depends on the correcteness of
-     * method add()
-     */
-    @Test
-    public void testIterator() {
-        HIterator it = instance.iterator();
-        boolean result = it.hasNext();
-        assertEquals("iteratore di una collezione vuota non deve avere un next", false, result);
-        instance.add("pippo");
-        it = instance.iterator();
-        result = it.hasNext();
-        assertEquals("iteratore di una collezione piena deve avere un next", true, result);
-        result = it.next().equals("pippo");
-        assertEquals("l'oggetto restituito dall'iteratore corrisponde a quello nella lista", true, result);
-        result = it.hasNext();
-        assertEquals("iteratore al termine della collezione, non deve avere next", false, result);
-        instance.add("pippo");
-        instance.add("pluto");
-        instance.add("topolino");
-        it = instance.iterator();
-        result = true;
-        int i = 0;
-        while (it.hasNext()) {
-            result = result && instance.contains(it.next());
-            i++;
-        }
-        result = result && instance.size() == i;
-        assertEquals("l'iteratore contiene tutti e solo gli oggetti contenuti nella lista", true, result);
-        
-        instance.clear();
-        instance.add("pippo");
-        instance.add("pluto");
-        it = instance.iterator();
-        Object o = it.next();
-        it.remove();
-        result = (instance.size() == 1) && !instance.contains(o);
-        assertEquals("il metodo remove rimuove correttamente l'oggetto appena restituito dal next", true, result);
-                
-        //controllo eccezioni
-        assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
-                () -> {
-                    instance.clear();
-                    instance.iterator().next();
-                });
-        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.clear();
-                    instance.add("pippo");
-                    instance.iterator().remove();
-                });
-        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.clear();
-                    instance.add("pippo");
-                    HIterator iter = instance.iterator();
-                    iter.next();
-                    iter.remove();
-                    iter.remove();
-                });
+        HCollection param = new List();
+        param.add("AaAaAa");
+        param.add("pluto");
+        boolean result = instance.removeAll(param);
+        assertEquals("elementi con hash uguali ma non equivalenti dovrebbero essere rimossi", true, result);
+        assertEquals("la dimensione dovrebbe diminuire", 1, instance.size());
     }
 
 }

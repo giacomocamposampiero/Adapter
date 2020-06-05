@@ -303,13 +303,14 @@ public class List implements HList {
      */
     @Override
     public boolean retainAll(HCollection c) {
-        boolean changed = false;
+        if(c == null) throw new NullPointerException();
+        List toRemove = new List();
         HIterator it = iterator();
         while(it.hasNext()) {
             Object elem = it.next();
-            if(!c.contains(elem)) changed = remove(elem) || changed;
+            if(!c.contains(elem)) toRemove.add(elem);
         }
-        return changed;   
+        return removeAll(toRemove);   
     }
 
     /**
