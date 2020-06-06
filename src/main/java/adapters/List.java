@@ -245,7 +245,7 @@ public class List implements HList {
      */
     @Override
     public HListIterator listIterator(int index) {
-        if (index < 0 || index >= size()) throw new IndexOutOfBoundsException();
+        if (index < 0 || index > size()) throw new IndexOutOfBoundsException();
         return new ListIterator(index, size());
     }
 
@@ -629,9 +629,9 @@ public class List implements HList {
         @Override
         public Object remove(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
-            List.this.remove(fromIndex + index);
+            Object toReturn = List.this.remove(fromIndex + index);
             toIndex--;
-            return true;
+            return toReturn;
         }
 
         @Override

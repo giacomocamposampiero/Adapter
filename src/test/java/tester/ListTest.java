@@ -38,7 +38,7 @@ public class ListTest {
     public static Collection classesToTest() {
         return Arrays.asList(new Object[][]{
             {"List"},
-            //{"SubList"}
+            {"SubList"}
         });
     }
     
@@ -769,7 +769,7 @@ public class ListTest {
         HListIterator it = instance.listIterator();
         int prev = it.previousIndex(), next = it.nextIndex();
         it.add("asso");
-        boolean in = (it.nextIndex()==next+1) && (it.previousIndex()==prev);
+        boolean in = (it.nextIndex()==next+1) && (it.previousIndex()==prev+1);
         assertEquals("i risultati di nextIndex e previousIndex devono essere incrementati di 1 dall'add", true, in);
         assertEquals("nuovo elemento aggiunto all'inizio della lista", "asso", instance.get(0));
         assertEquals("dimensione aumentata", 2, instance.size());
@@ -802,7 +802,7 @@ public class ListTest {
             assertEquals("ascending", instance.get(i++), it.next());
         }
         while(it.hasPrevious()) {
-            assertEquals("descending", instance.get(--i), it.next());
+            assertEquals("descending", instance.get(--i), it.previous());
         }
     }
     
@@ -834,7 +834,7 @@ public class ListTest {
         it.previous();
         it.remove();
         assertEquals("fine collezione", false, it.hasNext());
-        assertEquals("controllo ultimo elemento", "pippo", instance.get(3));
+        assertEquals("controllo ultimo elemento", "pippo", instance.get(2));
         assertEquals("controllo indici prev e next", true, it.previousIndex()==2 && it.nextIndex()==instance.size());
     }
     
@@ -924,7 +924,7 @@ public class ListTest {
                 });
         assertThrows("index is >= size", IndexOutOfBoundsException.class,
                 () -> {
-                    HListIterator it = instance.listIterator(instance.size());
+                    HListIterator it = instance.listIterator(instance.size()+1);
                 });
     }
 
@@ -1070,14 +1070,17 @@ public class ListTest {
     public void testSet_invalid() {
         assertThrows("parametro element null", NullPointerException.class,
                 () -> {
+                    instance.add("pippo");
                     instance.set(0, null);
                 });
         assertThrows("si specifica una posizione <0", IndexOutOfBoundsException.class,
                 () -> {
+                    instance.add("pippo");
                     instance.set(-1, "pippo");
                 });
         assertThrows("si specifica una posizione >=size()", IndexOutOfBoundsException.class,
                 () -> {
+                    instance.add("pippo");
                     instance.set(instance.size(), "pippo");
                 });
     }
