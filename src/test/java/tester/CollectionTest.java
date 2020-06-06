@@ -808,6 +808,7 @@ public class CollectionTest {
     @Test
     public void testRemoveAll_contained() {
         instance.add("pippo");
+        instance.add("pippo");
         instance.add("pluto");
         HCollection param = new Set();
         param.add("pippo");

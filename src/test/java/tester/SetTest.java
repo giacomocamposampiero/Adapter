@@ -3,8 +3,6 @@ package tester;
 import adapters.List;
 import adapters.Set;
 import interfaces.HCollection;
-import interfaces.HIterator;
-import java.util.NoSuchElementException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -12,7 +10,9 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
 /**
- * Test suite for Set class
+ * Test suite for Set class.
+ * This suite contains a sequence of tests which check the specific behaviuour of a Set. 
+ * More general behaviours (inherited by Collection interface) are tested in Collection test suite.
  * @author Giacomo Camposampiero
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

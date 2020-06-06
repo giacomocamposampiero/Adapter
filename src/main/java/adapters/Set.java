@@ -173,15 +173,20 @@ public class Set implements HSet{
      * @param c  collection that defines which elements will be removed from this set.  
      * @return  true if this set changed as a result of the call. 
      * @throws NullPointerException if the specified element is null.
-     * @throws NullPointerException if the specified collection contains an element which is null.
      */
     @Override
     public boolean removeAll(HCollection c) {
-        HIterator it = c.iterator();
-        boolean res = false;
-        while(it.hasNext())
-            res = remove(it.next()) || res;
-        return res;
+        if(c == null) throw new NullPointerException();
+        HIterator it = iterator();
+        boolean removed = false;
+        while(it.hasNext()) {
+            Object elem = it.next();
+            if(c.contains(elem)) {
+                remove(elem);
+                removed = true;
+            }
+        }
+        return removed;
     }
 
     /**

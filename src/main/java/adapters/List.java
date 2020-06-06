@@ -5,7 +5,6 @@ import interfaces.HIterator;
 import interfaces.HList;
 import interfaces.HListIterator;
 import exceptions.IllegalStateException;
-import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -139,15 +138,18 @@ public class List implements HList {
         if (o == this) {
             return true;
         }
-        if (!(o.getClass().equals(this.getClass()))) {
+        if (o == null) {
             return false;
         }
-        List other = (List) o;
+        if (!(o instanceof interfaces.HList)) {
+            return false;
+        }
+        HList other = (HList) o;
         if (other.size() != size()) {
             return false;
         }
-        for (Enumeration elems = vec.elements(); elems.hasMoreElements();) {
-            if (!other.contains(elems.nextElement())) {
+        for (int i=0; i < size(); i++) {
+            if (!get(i).equals(other.get(i))) {
                 return false;
             }
         }
@@ -285,11 +287,18 @@ public class List implements HList {
      */
     @Override
     public boolean removeAll(HCollection c) {
-        boolean changed = false;
-        HIterator it = c.iterator();
-        while(it.hasNext())
-            changed = remove(it.next()) || changed;
-        return changed;
+        if(c == null) throw new NullPointerException();
+        boolean removed = false;
+        int i = 0;
+        while(i < size()) {
+            if(c.contains(get(i))) {
+                remove(i);
+                removed = true;
+            } else {
+                i++;
+            }
+        }  
+        return removed;
     }
 
     /**
@@ -529,6 +538,39 @@ public class List implements HList {
         }
         
         @Override
+        public boolean equals(Object o) {
+            if (o == this) {
+                return true;
+            }
+            if (o == null) {
+                return false;
+            }
+            if (!(o instanceof interfaces.HList)) {
+                return false;
+            }
+            HList other = (HList) o;
+            if (other.size() != size()) {
+                return false;
+            }
+            for (int i=0; i < size(); i++) {
+                if (!get(i).equals(other.get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hashCode = 1;
+            for(int i=0; i < size(); i++) {
+                Object obj = get(i);
+                hashCode = 31 * hashCode + obj.hashCode();
+            }
+            return hashCode;
+        }
+        
+        @Override
         public Object get(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
             return List.this.get(fromIndex + index);
@@ -594,28 +636,29 @@ public class List implements HList {
 
         @Override
         public boolean removeAll(HCollection c) {
-            boolean res = false;
-            HIterator it = c.iterator();
-            while(it.hasNext())
-                res = remove(it.next()) || res;
-            return res;
+            if(c == null) throw new NullPointerException();
+            boolean removed = false;
+            int i = 0;
+            while(i < size()) {
+                if(c.contains(get(i))) {
+                   remove(i);
+                    removed = true;
+                } else {
+                    i++;
+                }
+            }  
+            return removed;
         }
 
         @Override
         public boolean retainAll(HCollection c) {
             if(c == null) throw new NullPointerException();
-            boolean changed = false;
-            int i = 0;
-            while(i < size()) {
+            List toRemove = new List();
+            for(int i=0; i< size(); i++) {
                 Object elem = get(i);
-                if(!c.contains(elem)) {
-                    remove(i);
-                    changed = true;
-                } else {
-                    i++;
-                }
+                if(!c.contains(elem)) toRemove.add(elem);
             }
-            return changed;
+            return removeAll(toRemove);  
         }
          
         @Override
