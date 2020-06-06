@@ -54,7 +54,7 @@ public class CollectionTest {
             tmp.add("topolino");
             tmp.add("asso");
             tmp.add("minnie");
-            instance = tmp.subList(1, 5);
+            instance = tmp.subList(1, 1);
         } else {
             try {
                 instance = (HCollection) Class.forName("adapters."+paramClass).getConstructor().newInstance();
@@ -572,6 +572,7 @@ public class CollectionTest {
         HIterator it = instance.iterator();
         it.next();
         it.remove();
+        System.out.println("pene "+instance);
         assertEquals("la rimozione è stata fatta, la collezione dovrebbe essere vuota", true, instance.isEmpty());
     }
     
@@ -954,7 +955,8 @@ public class CollectionTest {
         param.add("paperino");
         param.add("asso");
         boolean result = instance.retainAll(param);
-        assertEquals("trattiene tutti gli elementi della lista", true, result);
+        assertEquals("non trattiene nessun elemento della lista", true, result);
+        System.out.println(instance);
         assertEquals("la collezione ora è vuota", true, instance.isEmpty());
     }
     

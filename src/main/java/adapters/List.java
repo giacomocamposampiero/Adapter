@@ -162,9 +162,8 @@ public class List implements HList {
     @Override
     public int hashCode() {
         int hashCode = 1;
-        HIterator it = iterator();
-        while (it.hasNext()) {
-            Object obj = it.next();
+        for(int i=0; i < size(); i++) {
+            Object obj = get(i);
             hashCode = 31 * hashCode + obj.hashCode();
         }
         return hashCode;
@@ -305,9 +304,8 @@ public class List implements HList {
     public boolean retainAll(HCollection c) {
         if(c == null) throw new NullPointerException();
         List toRemove = new List();
-        HIterator it = iterator();
-        while(it.hasNext()) {
-            Object elem = it.next();
+        for(int i=0; i< size(); i++) {
+            Object elem = get(i);
             if(!c.contains(elem)) toRemove.add(elem);
         }
         return removeAll(toRemove);   
@@ -350,7 +348,7 @@ public class List implements HList {
      */
     @Override
     public HList subList(int fromIndex, int toIndex) {
-        if(fromIndex < 0 || fromIndex > toIndex || toIndex >= size()) throw new IndexOutOfBoundsException();
+        if(fromIndex < 0 || fromIndex > toIndex || toIndex > size()) throw new IndexOutOfBoundsException();
         return new SubList(fromIndex, toIndex);
     }
 
@@ -392,8 +390,7 @@ public class List implements HList {
     @Override
     public String toString() {
         String res = "";
-        HIterator it = iterator();
-        while(it.hasNext()) res += it.next().toString() + " ";
+        for(int i=0; i < size(); i++) res += get(i).toString() + " ";
         return res;
     }
 
@@ -539,11 +536,9 @@ public class List implements HList {
         
         @Override
         public int indexOf(Object o) {
-            HIterator it = iterator();
-            int i = 0;
-            while(it.hasNext()) {
-                if(o.equals(it.next())) return i;
-                i++;
+            if(o == null) throw new NullPointerException();
+            for(int i=0; i < size(); i++) {
+                if(o.equals(get(i))) return i;
             }
             return -1;
         }
@@ -555,28 +550,28 @@ public class List implements HList {
 
         @Override
         public HIterator iterator() {
-            return new ListIterator(fromIndex, toIndex);
+            return new SubListIterator(fromIndex, toIndex);
         }
         
         @Override
         public int lastIndexOf(Object o) {
+            if(o == null) throw new NullPointerException();
             int res = -1;
-            HIterator it = iterator();
-            for(int i=-1; it.hasNext(); i++) {
-                if(o.equals(it.next())) res = i;
+            for(int i=0; i < size(); i++) {
+                if(o.equals(get(i))) res = i;
             }
             return res;
         }
 
         @Override
         public HListIterator listIterator() {
-            return new ListIterator(fromIndex, toIndex);
+            return new SubListIterator(fromIndex, toIndex);
         }
 
         @Override
         public HListIterator listIterator(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
-            return new ListIterator(fromIndex + index, toIndex);
+            return new SubListIterator(fromIndex + index, toIndex);
         }
 
         @Override
@@ -592,7 +587,7 @@ public class List implements HList {
         @Override
         public Object remove(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
-            List.this.remove(index);
+            List.this.remove(fromIndex + index);
             toIndex--;
             return true;
         }
@@ -608,16 +603,17 @@ public class List implements HList {
 
         @Override
         public boolean retainAll(HCollection c) {
+            if(c == null) throw new NullPointerException();
             boolean changed = false;
-            HIterator it = iterator();
             int i = 0;
-            while(it.hasNext()) {
-                Object elem = it.next();
+            while(i < size()) {
+                Object elem = get(i);
                 if(!c.contains(elem)) {
-                    List.this.remove(fromIndex + i);
+                    remove(i);
                     changed = true;
+                } else {
+                    i++;
                 }
-                i++;
             }
             return changed;
         }
@@ -641,22 +637,51 @@ public class List implements HList {
 
         @Override
         public Object[] toArray() {
-            HIterator it = iterator();
             Object[] arr = new Object[size()];
-            for(int i=0; it.hasNext(); i++) arr[i] = it.next();
+            for(int i=0; i < size(); i++) arr[i] = get(i);
             return arr;
         }
 
         @Override
         public Object[] toArray(Object[] a) {
-            HIterator it = iterator();
+            Object[] arr;
             if(a.length >= size()) {
-                for(int i=0; it.hasNext(); i++) a[i] = it.next();
-                return a;
+                arr = a;
+            } else {
+                arr = new Object[size()];
             }
-            Object[] arr = new Object[size()];
-            for(int i=0; it.hasNext(); i++) a[i] = it.next();
+            for(int i=0; i < size(); i++) arr[i] = get(i);
             return arr;
+        }
+        
+        @Override
+        public String toString() {
+            String res = "";
+            for(int i=0; i < size(); i++) res += get(i).toString() + " ";
+            return res;
+        }
+        
+        /**
+         * SubList iterator, extends List iterator class.
+         */
+        class SubListIterator extends ListIterator {
+
+            public SubListIterator(int index, int upperBond) {
+                super(index, upperBond);
+            }
+
+            @Override
+            public void add(Object o) {
+                super.add(o);
+                toIndex++;
+            }
+            
+            @Override
+            public void remove() {
+                super.remove();
+                toIndex--;
+            }
+
         }
 
     }
