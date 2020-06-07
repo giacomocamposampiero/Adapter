@@ -1237,6 +1237,7 @@ public class ListTest {
         instance.add("pippo");
         instance.add("pippo");
         instance.add("pippo");
+        System.out.println(instance);
         HList sub = instance.subList(1, 4);
         int min = sub.indexOf("pippo"), max = sub.lastIndexOf("pippo");
         assertEquals("minimo indice nella vista", 0, min);

@@ -211,7 +211,7 @@ public class List implements HList {
      */
     @Override
     public HIterator iterator() {
-        return new ListIterator(0, size());
+        return new ListIterator(0, 0, size());
     }
 
     /**
@@ -246,7 +246,7 @@ public class List implements HList {
     @Override
     public HListIterator listIterator(int index) {
         if (index < 0 || index > size()) throw new IndexOutOfBoundsException();
-        return new ListIterator(index, size());
+        return new ListIterator(0, index, size());
     }
 
     /**
@@ -410,11 +410,14 @@ public class List implements HList {
         
         private int cursor;
         private int current;
-        private int upperBond;
         
-        public ListIterator(int index, int upperBond) {
+        private int upperBound;
+        private final int lowerBound;
+        
+        public ListIterator(int lowerBond, int index, int upperBond) {
+            this.lowerBound = lowerBond;
+            this.upperBound = upperBond;
             this.cursor = index;
-            this.upperBond = upperBond;
             current = -1;
         }
 
@@ -422,18 +425,18 @@ public class List implements HList {
         public void add(Object o) {
             if(o == null) throw new IllegalArgumentException();
             vec.add(cursor++, o);
-            upperBond++;
+            upperBound++;
             current = -1;
         }
 
         @Override
         public boolean hasPrevious() {
-            return cursor > 0;
+            return cursor > lowerBound;
         }
 
         @Override
         public int nextIndex() {
-            return cursor; 
+            return cursor - lowerBound; 
         }
 
         @Override
@@ -445,7 +448,7 @@ public class List implements HList {
 
         @Override
         public int previousIndex() {
-            return cursor-1;
+            return cursor - lowerBound - 1;
         }
 
         @Override
@@ -457,7 +460,7 @@ public class List implements HList {
 
         @Override
         public boolean hasNext() {
-            return cursor < upperBond;
+            return cursor < upperBound;
         }
 
         @Override
@@ -472,7 +475,7 @@ public class List implements HList {
             if(current == -1) throw new IllegalStateException();
             vec.remove(current);
             if(current != cursor) cursor--;
-            upperBond--;
+            upperBound--;
             current = -1;
         }
 
@@ -485,10 +488,18 @@ public class List implements HList {
 
         private final int fromIndex;
         private int toIndex;
+        private final SubList upper;
 
         public SubList(int fromIndex, int toIndex) {
             this.fromIndex = fromIndex;
             this.toIndex = toIndex;
+            upper = null;
+        }
+
+        public SubList(int fromIndex, int toIndex, SubList upper) {
+            this.fromIndex = fromIndex;
+            this.toIndex = toIndex;
+            this.upper = upper;
         }
  
         @Override
@@ -501,6 +512,7 @@ public class List implements HList {
         public void add(int index, Object element) {
             if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
             List.this.add(fromIndex + index, element);
+            if(upper != null) upper.toIndex++;
             toIndex++;
         }
 
@@ -513,14 +525,17 @@ public class List implements HList {
         public boolean addAll(int index, HCollection c) {
             if(index < 0 || index > size()) throw new IndexOutOfBoundsException();
             boolean res =  List.this.addAll(fromIndex + index, c);
+            if(upper != null) upper.toIndex += c.size();
             toIndex += c.size();
             return res;
         }
 
         @Override
         public void clear() {
+            int size = size();
             while(fromIndex < toIndex)
                 List.this.remove(--toIndex);
+            if(upper != null) upper.toIndex -= size;
         }
 
         @Override
@@ -592,7 +607,7 @@ public class List implements HList {
 
         @Override
         public HIterator iterator() {
-            return new SubListIterator(fromIndex, toIndex);
+            return new SubListIterator(fromIndex, fromIndex, toIndex);
         }
         
         @Override
@@ -607,13 +622,13 @@ public class List implements HList {
 
         @Override
         public HListIterator listIterator() {
-            return new SubListIterator(fromIndex, toIndex);
+            return new SubListIterator(fromIndex, fromIndex, toIndex);
         }
 
         @Override
         public HListIterator listIterator(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
-            return new SubListIterator(fromIndex + index, toIndex);
+            return new SubListIterator(fromIndex, fromIndex + index, toIndex);
         }
 
         @Override
@@ -630,6 +645,7 @@ public class List implements HList {
         public Object remove(int index) {
             if(index < 0 || index >= size()) throw new IndexOutOfBoundsException();
             Object toReturn = List.this.remove(fromIndex + index);
+            if(upper != null) upper.toIndex--;
             toIndex--;
             return toReturn;
         }
@@ -641,7 +657,7 @@ public class List implements HList {
             int i = 0;
             while(i < size()) {
                 if(c.contains(get(i))) {
-                   remove(i);
+                    remove(i);
                     removed = true;
                 } else {
                     i++;
@@ -674,8 +690,8 @@ public class List implements HList {
         
         @Override
         public HList subList(int fromIndex, int toIndex) {
-            if(fromIndex < 0 || fromIndex > toIndex || toIndex >= size()) throw new IndexOutOfBoundsException();
-            return new SubList(this.fromIndex + fromIndex, this.fromIndex + toIndex);
+            if(fromIndex < 0 || fromIndex > toIndex || toIndex > size()) throw new IndexOutOfBoundsException();
+            return new SubList(this.fromIndex + fromIndex, this.fromIndex + toIndex, this);
         }
 
         @Override
@@ -709,8 +725,8 @@ public class List implements HList {
          */
         class SubListIterator extends ListIterator {
 
-            public SubListIterator(int index, int upperBond) {
-                super(index, upperBond);
+            public SubListIterator(int lowerBound, int index, int upperBond) {
+                super(lowerBound, index, upperBond);
             }
 
             @Override
