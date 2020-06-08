@@ -47,6 +47,21 @@ public class SetTest {
         assertEquals("dimensione inalterata", 1, instance.size());
     }
     
+//    @Test
+//    public void testAdd_hash() {
+//        boolean result = instance.add("AaAaBB");
+//        assertEquals("elemento inserito", true, result);
+//        result = instance.add("AaAaAa");
+//        assertEquals("elemento inserito", true, result);
+//        result = instance.contains("AaAaBB");
+//        assertEquals("elemento contenuto", true, result);
+//        Set dop = new Set();
+//        dop.add("AaAaBB");
+//        dop.add("AaAaAA");
+//        result = instance.containsAll(dop);
+//        assertEquals("elemento contenuto", true, result);
+//    }
+    
     /**
      * @title Test #1 of addAll method, of class Set.
      * @description This test tests the behaviour of the method addAll() when called using a collection which contains duplicates.

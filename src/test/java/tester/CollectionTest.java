@@ -572,7 +572,6 @@ public class CollectionTest {
         HIterator it = instance.iterator();
         it.next();
         it.remove();
-        System.out.println("pene "+instance);
         assertEquals("la rimozione è stata fatta, la collezione dovrebbe essere vuota", true, instance.isEmpty());
     }
     
@@ -957,7 +956,6 @@ public class CollectionTest {
         param.add("asso");
         boolean result = instance.retainAll(param);
         assertEquals("non trattiene nessun elemento della lista", true, result);
-        System.out.println(instance);
         assertEquals("la collezione ora è vuota", true, instance.isEmpty());
     }
     

@@ -1102,8 +1102,6 @@ public class ListTest {
         sub.add("pluto");
         assertEquals("aggiunte apportate alla sottolista", 2, sub.size());
         assertEquals("aggiunte apportate alla lista madre", 2, instance.size());
-        System.out.println(sub);
-        System.out.println(instance);
         assertEquals("le due liste si equivalgono", true, sub.equals(instance));
         sub.remove(0);
         assertEquals("rimozioni apportate alla lista madre", 1, instance.size());
@@ -1195,7 +1193,6 @@ public class ListTest {
         assertEquals("rimozioni apportate alla lista madre", 6, instance.size());
         assertEquals("controllo elementi aggiunti", true, instance.get(0).equals("pietra") && instance.get(1).equals("asso"));
         param.remove("pietra");
-        System.out.println(instance);
         sub.removeAll(param);
         assertEquals("rimozioni apportate alla lista madre", 4, instance.size());
         assertEquals("controllo get", "pietra", sub.get(0));
@@ -1237,7 +1234,6 @@ public class ListTest {
         instance.add("pippo");
         instance.add("pippo");
         instance.add("pippo");
-        System.out.println(instance);
         HList sub = instance.subList(1, 4);
         int min = sub.indexOf("pippo"), max = sub.lastIndexOf("pippo");
         assertEquals("minimo indice nella vista", 0, min);
