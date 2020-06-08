@@ -64,11 +64,11 @@ public class Map implements HMap {
      * set, and vice-versa.  If the map is modified while an iteration over the 
      * set is in progress (except through the iterator's own remove operation, 
      * or through the setValue operation on a map entry returned by the iterator)
-     * the results of the iteration are undefined.  
+     * the results of the iteration are undefined. 
+     * 
      * The set supports element removal, which removes the corresponding mapping
      * from the map, via the Iterator.remove, Set.remove, removeAll, retainAll 
-     * and clear operations.  
-     * It does not support the add or addAll operations.
+     * and clear operations. It does not support the add or addAll operations.
      * @return a set view of the mappings contained in this map
      */
     @Override
@@ -81,6 +81,7 @@ public class Map implements HMap {
      * Returns  true if the given object is also a map and the two maps 
      * represent the same mappings. More formally, two maps m1 and  m2 represent
      * the same mappings if m1.entrySet().equals(m2.entrySet()).  
+     * 
      * This ensures that the equals method works properly across different 
      * implementations of the Map interface.
      * @param obj object to be compared for equality with this map
@@ -107,6 +108,7 @@ public class Map implements HMap {
      * More formally, if this map contains a mapping from a key k to a value v 
      * such that key.equals(k), then this method returns v; otherwise it returns
      * null (there can be at most one such mapping.)
+     * 
      * The map doesn't allow null values, so a null return value explicitly 
      * represent the absence of the specified key in the map.
      * @param key the key whose associated value is to be returned
@@ -124,6 +126,7 @@ public class Map implements HMap {
      * Returns the hash code value for this map.  
      * The hash code of a map is defined to be the sum of the hash codes of each
      * entry in the map's entrySet() view.  
+     * 
      * This ensures that m1.equals(m2) implies that m1.hashCode()==m2.hashCode()
      * for any two maps  m1 and m2, as required by the general contract of 
      * Object.hashCode
@@ -149,6 +152,7 @@ public class Map implements HMap {
      * set, and vice-versa. If the map is modified while an iteration over the 
      * set is in progress (except through the iterator's own remove operation), 
      * the results of the iteration are undefined.  
+     * 
      * The set supports element removal, which removes the corresponding mapping
      * from the map, via the Iterator.remove, Set.remove, removeAll, retainAll, 
      * and clear operations.  It does not support the add or addAll operations.
@@ -204,6 +208,7 @@ public class Map implements HMap {
      * at most one such mapping.)
      * Returns the value to which this map previously associated the key, or null
      * if the map contained no mapping for the key.
+     * 
      * The map doesn't allow null values, so a null return value explicitly 
      * represent the absence of the specified key in the map.
      * The map will not contain a mapping for the specified key once the call returns.
@@ -233,6 +238,7 @@ public class Map implements HMap {
      * in the collection, and vice-versa. If the map is modified while an 
      * iteration over the collection is in progress (except through the iterator's
      * own remove operation), the results of the iteration are undefined.  
+     * 
      * The collection supports element removal, which removes the corresponding 
      * mapping from the map, via the Iterator.remove, Collection.remove, 
      * removeAll, retainAll and clear operations. It does not  support the add 

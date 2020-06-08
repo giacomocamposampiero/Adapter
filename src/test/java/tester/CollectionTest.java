@@ -455,7 +455,7 @@ public class CollectionTest {
     
     /**
      * @title Test #8 of containsAll method, of an istance of a class which implements Collection interface.
-     * @description This test tests the behaviour of the method containsAll() when called using a null reference. The case of call of the method using a collection which contains a null reference as element cannot be tested, as there are no collection implementations which supports null elements.
+     * @description This test tests the behaviour of the method containsAll() when called using a null reference. 
      * @expectedResults A NullPointerException is expected as result of the call of the method.
      * @actualResult As expected result.
      * @dependencies The correctness of this method does not depends on the correctness of any other method of the class.
@@ -961,7 +961,7 @@ public class CollectionTest {
     
     /**
      * @title Test #6 of retainAll method, of an istance of a class which implements Collection interface.
-     * @description This test tests the behaviour of retainAll() method when called using a null reference as parameter. The case of a param which is not null but contains null references as elements cannot be tested, as no collections which accept are available.
+     * @description This test tests the behaviour of retainAll() method when called using a null reference as parameter. 
      * @expectedResults The class is expected to throw a NullPointerException.
      * @actualResult As expected result.
      * @dependencies This test correctness does not depends on the correctness of any other method.

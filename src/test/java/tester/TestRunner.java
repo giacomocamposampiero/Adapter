@@ -7,7 +7,8 @@ import org.junit.runner.notification.Failure;
 public class TestRunner {
 
     public static void main(String[] args) {
-        String[] test = {"tester.MapTest", "tester.ListTest", "tester.SetTest", "tester.SubListTester"};
+        System.out.println("Avvio dei test... \n\n");
+        String[] test = {"tester.MapTest", "tester.ListTest", "tester.SetTest", "tester.CollectionTest"};
         for (String name : test) {
             Class clazz = null;
             try {
@@ -20,8 +21,9 @@ public class TestRunner {
             for (Failure failure : result.getFailures()) {
                 System.out.println(failure.toString());
             }
-            System.out.println("Test successful == " + result.wasSuccessful());
-            System.out.println("___________________\n\n");
+            System.out.println("Test successful: " + result.wasSuccessful()+".");
+            System.out.println("Test statistics: "+(result.getRunCount()-result.getFailureCount())+" succeeded, "+result.getIgnoreCount()+" ignored, "+result.getFailureCount()+" failed.");
+            System.out.println("___________________\n");
         }
     }
     

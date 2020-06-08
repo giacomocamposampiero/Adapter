@@ -3,11 +3,17 @@ package tester;
 import adapters.List;
 import adapters.Set;
 import interfaces.HCollection;
+import interfaces.HSet;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.junit.runners.Parameterized;
 
 /**
  * Test suite for Set class.
@@ -15,18 +21,32 @@ import org.junit.runners.MethodSorters;
  * More general behaviours (inherited by Collection interface) are tested in Collection test suite.
  * @author Giacomo Camposampiero
  */
+@RunWith(Parameterized.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SetTest {
 
-    private Set instance;
+    private final String paramClass;
+    private HSet instance;
 
+    public SetTest(String paramClass) {
+        this.paramClass = paramClass;
+    }
+    
+    @Parameterized.Parameters(name="{0}")
+    public static Collection classesToTest() {
+        return Arrays.asList(new Object[][]{
+            {"Set"}
+        });
+    }
+    
     @Before
-    public void executedBeforeEach() {
-        instance = new Set();
-    }
-
-    public SetTest() {
-    }
+    public void initialize() {
+        try {
+            instance = (HSet) Class.forName("adapters."+paramClass).getConstructor().newInstance();
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException | SecurityException  ex) {
+            System.exit(1);
+        }
+    }  
 
     /**
      * @title Test #1 of add method, of class Set.
@@ -46,21 +66,6 @@ public class SetTest {
         assertEquals("elemento già contenuto nel set, non inserito", false, result);
         assertEquals("dimensione inalterata", 1, instance.size());
     }
-    
-//    @Test
-//    public void testAdd_hash() {
-//        boolean result = instance.add("AaAaBB");
-//        assertEquals("elemento inserito", true, result);
-//        result = instance.add("AaAaAa");
-//        assertEquals("elemento inserito", true, result);
-//        result = instance.contains("AaAaBB");
-//        assertEquals("elemento contenuto", true, result);
-//        Set dop = new Set();
-//        dop.add("AaAaBB");
-//        dop.add("AaAaAA");
-//        result = instance.containsAll(dop);
-//        assertEquals("elemento contenuto", true, result);
-//    }
     
     /**
      * @title Test #1 of addAll method, of class Set.

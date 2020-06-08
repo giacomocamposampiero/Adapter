@@ -10,8 +10,10 @@ import java.util.Vector;
 
 /**
  * Implementation of List interface Java 1.4.2.
- * This implementation is the actual concrete implementation for Collection interface too. If a concrete implementation of a Collection is needed, a List object should be instantiated.
- * @author Giacomo Camposampiero (Set interface is defined by java.util.Set and this is just an adapted redefinition of it, all credit goes to Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA)
+ * This implementation is the actual concrete implementation for Collection 
+ * interface too. If a concrete implementation of a Collection is needed, a List
+ * object should be instantiated.
+ * @author Giacomo Camposampiero 
  */
 public class List implements HList {
 
@@ -23,12 +25,16 @@ public class List implements HList {
 
     /**
      * Inserts the specified element at the specified position in this list.
-     * Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices). 
-     * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
+     * Shifts the element currently at that position (if any) and any subsequent
+     * elements to the right (adds one to their indices). 
+     * 
+     * Null parameters are not accepted in this list, an exception will be thrown
+     * as result of an attempt to add a null object to the list
      * @param index index at which the specified element is to be inserted.
      * @param element element to be inserted. 
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
-     * @throws NullPointerException if the element parameter is null
+     * @throws NullPointerException if the parameter is a null reference.
+     *         which is not considered a valid type of entry for the collection
      */    
     @Override
     public void add(int index, Object element) {
@@ -39,10 +45,12 @@ public class List implements HList {
 
     /**
      * Appends the specified element to the end of this list.
-     * Null parameters are not accepted in this list, an exception will be thrown as result of an attempt to add a null object to the list
+     * Null parameters are not accepted in this list, an exception will be thrown 
+     * as result of an attempt to add a null object to the list
      * @param o  element that has to be inserted. 
      * @return  true if this list changed as a result of the call  
-     * @throws NullPointerException whether the parameter is a null reference, which is not considered a valid type of entry for the collection
+     * @throws NullPointerException whether the parameter is a null reference, 
+     *         which is not considered a valid type of entry for the collection
      */
     @Override
     public boolean add(Object o) {
@@ -51,13 +59,16 @@ public class List implements HList {
     }
 
     /**
-     * Appends all of the elements in the specified collection to the end of this list, in the order that they are returned by the specified collection's iterator.
-     * The behavior of this operation is undefined if the specified collection is modified while the operation is in progress.
+     * Appends all of the elements in the specified collection to the end of 
+     * this list, in the order that they are returned by the specified collection's 
+     * iterator.
+     * The behavior of this operation is undefined if the specified collection 
+     * is modified while the operation is in progress.
      * @param c  elements to be inserted into this list.
      * @return  true if this collection changed as a result of the call. 
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()]
      * @throws NullPointerException if the element parameter is null
-     * @throws NullPointerException if the collection contains null elementes
+     * @throws NullPointerException if the collection contains null elements
      */
     @Override
     public boolean addAll(HCollection c) {
@@ -65,10 +76,15 @@ public class List implements HList {
     }
 
     /**
-     * Inserts all of the elements in the specified collection into this list at the specified position.
-     * Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices).
-     * The new elements will appear in this list in the order that they are returned by the specified collection's iterator.
-     * The behavior of this operation is unspecified if the specified collection is modified while the operation is in progress.
+     * Inserts all of the elements in the specified collection into this list at
+     * the specified position.
+     * Shifts the element currently at that position (if any) and any subsequent
+     * elements to the right (increases their indices). New elements will appear 
+     * in this list in the order that they are returned by the specified 
+     * collection's iterator.
+     * 
+     * The behavior of this operation is unspecified if the specified collection
+     * is modified while the operation is in progress.
      * @param index  index at which to insert first element from the specified collection.
      * @param c  elements to be inserted into this list.    
      * @return  true if this list changed as a result of the call. 
@@ -99,7 +115,8 @@ public class List implements HList {
 
     /**
      * Returns true if this list contains the specified element.
-     * More formally, returns true if and only if this list contains at least one element e such that (o==null ? e==null : o.equals(e)). 
+     * More formally, returns true if and only if this list contains at least one
+     * element e such that (o==null ? e==null : o.equals(e)). 
      * @param o  element whose presence in this list is to be tested. 
      * @return  true if this list contains the specified element. 
      * @throws NullPointerException if the parameters is null.
@@ -129,7 +146,8 @@ public class List implements HList {
 
     /**
      * Compares the specified object with this list for equality.
-     * The general contract for the Object.equals method states that equals must be symmetric (in other words, a.equals(b) if and only if b.equals(a)). 
+     * The general contract for the Object.equals method states that equals must
+     * be symmetric (in other words, a.equals(b) if and only if b.equals(a)). 
      * @param o  the object to be compared for equality with this list. 
      * @return  true if the specified object is equal to this list.
      */
@@ -184,10 +202,13 @@ public class List implements HList {
     }
 
     /**
-     * Returns the index in this list of the first occurrence of the specified element, or -1 if this list does not contain this element.
-     * More formally, returns the lowest index i such that (o==null ? get(i)==null : o.equals(get(i))), or -1 if there is no such index. 
+     * Returns the index in this list of the first occurrence of the specified 
+     * element, or -1 if this list does not contain this element.
+     * More formally, returns the lowest index i such that 
+     * (o==null ? get(i)==null : o.equals(get(i))), or -1 if there is no such index. 
      * @param o  element to search for.     
-     * @return  the index in this list of the first occurrence of the specified element, or -1 if this list does not contain this element. 
+     * @return  the index in this list of the first occurrence of the specified 
+     *          element, or -1 if this list does not contain this element. 
      * @throws NullPointerException if the element parameter is null
      */
     @Override
@@ -207,6 +228,11 @@ public class List implements HList {
 
     /**
      * Returns an iterator over the elements in this list in proper sequence. 
+     * Many iterators can be istantiated on the same list, and they won't cause
+     * cuncurrency problems if they all perform only readings from the list.
+     * If a structural modification is performed on the list, this will result in
+     * an incoherent behaviour of the iterator, which may throw unreported exceptions
+     * or values. 
      * @return  an iterator over the elements in this collection.
      */
     @Override
@@ -215,8 +241,10 @@ public class List implements HList {
     }
 
     /**
-     * Returns the index in this list of the last occurrence of the specified element, or -1 if this list does not contain this element.
-     * More formally, returns the highest index i such that (o==null ? get(i)==null : o.equals(get(i))), or -1 if there is no such index. 
+     * Returns the index in this list of the last occurrence of the specified 
+     * element, or -1 if this list does not contain this element.
+     * More formally, returns the highest index i such that 
+     * (o==null ? get(i)==null : o.equals(get(i))), or -1 if there is no such index. 
      * @param o  element to search for. 
      * @return the index in this list of the last occurrence of the specified element, or -1 if this list does not contain this element. 
      * @throws NullPointerException if the element parameter is null
@@ -229,6 +257,11 @@ public class List implements HList {
 
     /**
      * Returns a list iterator of the elements in this list (in proper sequence).
+     * Many iterators can be istantiated on the same list, and they won't cause
+     * cuncurrency problems if they all perform only readings from the list.
+     * If a structural modification is performed on the list, this will result in
+     * an incoherent behaviour of the iterator, which may throw unreported exceptions
+     * or values. 
      * @return a list iterator of the elements in this list (in proper sequence).
      */
     @Override
@@ -237,10 +270,21 @@ public class List implements HList {
     }
 
     /**
-     * Returns a list iterator of the elements in this list (in proper sequence), starting at the specified position in this list.
-     * The specified index indicates the first element that would be returned by an initial call to the next method. An initial call to the previous method would return the element with the specified index minus one. 
-     * @param index  index of first element to be returned from the list iterator (by a call to the next method). 
-     * @return  a list iterator of the elements in this list (in proper sequence), starting at the specified position in this list. 
+     * Returns a list iterator of the elements in this list (in proper sequence),
+     * starting at the specified position in this list.
+     * The specified index indicates the first element that would be returned by
+     * an initial call to the next method. An initial call to the previous method
+     * would return the element with the specified index minus one. 
+     * 
+     * Many iterators can be istantiated on the same list, and they won't cause
+     * cuncurrency problems if they all perform only readings from the list.
+     * If a structural modification is performed on the list, this will result in
+     * an incoherent behaviour of the iterator, which may throw unreported exceptions
+     * or values. 
+     * @param index  index of first element to be returned from the list iterator 
+     *               (by a call to the next method). 
+     * @return  a list iterator of the elements in this list (in proper sequence), 
+     *          starting at the specified position in this list. 
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()-1]
      */
     @Override
@@ -251,7 +295,8 @@ public class List implements HList {
 
     /**
      * Removes the element at the specified position in this list.
-     * Shifts any subsequent elements to the left (subtracts one from their indices). Returns the element that was removed from the list. 
+     * Shifts any subsequent elements to the left (subtracts one from their indices).
+     * Returns the element that was removed from the list. 
      * @param index the index of the element to removed.   
      * @return the element previously at the specified position.
      * @throws IndexOutOfBoundsException if the index parameter isn't in the interval [0, size()-1]
@@ -266,7 +311,10 @@ public class List implements HList {
 
     /**
      * Removes the first occurrence in this list of the specified element, if it is present.
-     * More formally, removes an element e such that (o==null ? e==null : o.equals(e)), if this list contains one or more such elements. Returns true if this list contained the specified element (or equivalently, if this list changed as a result of the call). 
+     * More formally, removes an element e such that (o==null ? e==null : o.equals(e)),
+     * if this list contains one or more such elements. 
+     * Returns true if this list contained the specified element (or equivalently, 
+     * if this list changed as a result of the call). 
      * @param o  element to be removed from this list, if present. 
      * @return  true if this list contained the specified element. 
      * @throws NullPointerException if the parameters is null.
@@ -278,12 +326,13 @@ public class List implements HList {
     }
 
     /**
-     * Removes from this list all the elements that are contained in the specified collection.
-     * After this call returns, this list will contain no elements in common with the specified collection. 
-     * @param c  collection that defines which elements will be removed from this list.  
-     * @return  true if this list changed as a result of the call. 
+     * Removes from this list all the elements that are contained in the specified 
+     * collection.
+     * After this call returns, this list will contain no elements in common with 
+     * the specified collection. 
+     * @param c collection that defines which elements will be removed from this list.  
+     * @return true if this list changed as a result of the call. 
      * @throws NullPointerException if the parameters is null.
-     * @throws NullPointerException if the specified collection contains one or more null elements.
      */
     @Override
     public boolean removeAll(HCollection c) {
@@ -302,12 +351,13 @@ public class List implements HList {
     }
 
     /**
-     * Retains only the elements in this list that are contained in the specified collection.
-     * In other words, removes from this list all of its elements that are not contained in the specified collection.  
-     * @param c  collection that defines which elements this list will retain. 
-     * @return  true if this list changed as a result of the call. 
+     * Retains only the elements in this list that are contained in the specified 
+     * collection.
+     * In other words, removes from this list all of its elements that are not 
+     * contained in the specified collection.  
+     * @param c collection that defines which elements this list will retain. 
+     * @return true if this list changed as a result of the call. 
      * @throws NullPointerException if the parameters is null.
-     * @throws NullPointerException if the specified collection contains one or more null elements.
      */
     @Override
     public boolean retainAll(HCollection c) {
@@ -321,7 +371,8 @@ public class List implements HList {
     }
 
     /**
-     * Replaces the element at the specified position in this list with the specified element.
+     * Replaces the element at the specified position in this list with the 
+     * specified element.
      * @param index  index of element to replace.
      * @param element element to be stored at the specified position. 
      * @return the element previously at the specified position. 
@@ -347,9 +398,24 @@ public class List implements HList {
     }
 
     /**
-     * Returns a view of the portion of this list between the specified fromIndex, inclusive, and toIndex, exclusive.
-     * (If fromIndex and toIndex are equal, the returned list is empty.) The returned list is backed by this list, so non-structural changes in the returned list are reflected in this list, and vice-versa. The returned list supports all of the optional list operations supported by this list.
-     * The semantics of the list returned by this method become undefined if the backing list (i.e., this list) is structurally modified in any way other than via the returned list. (Structural modifications are those that change the size of this list, or otherwise perturb it in such a fashion that iterations in progress may yield incorrect results.) 
+     * Returns a view of the portion of this list between the specified fromIndex, 
+     * inclusive, and toIndex, exclusive.
+     * If fromIndex and toIndex are equal, the returned list is empty.
+     * 
+     * The returned list is backed by this list, so non-structural changes in the
+     * returned list are reflected in this list, and vice-versa. The returned list
+     * supports all of the optional list operations supported by this list.
+     * 
+     * The semantics of the list returned by this method become undefined if the
+     * backing list (i.e., this list) is structurally modified in any way other 
+     * than via the returned list. (Structural modifications are those that change
+     * the size of this list, or otherwise perturb it in such a fashion that iterations
+     * in progress may yield incorrect results.) 
+     * 
+     * If the modifications are performed in an area which indexes are higher than 
+     * the upper bound of the list, it won't cause any inconsistency in the sublist.
+     * On the other hand, if the modification is performed in an area of index
+     * lower than the last index of the sublist, this will cause an inconsistency.
      * @param fromIndex  low endpoint (inclusive) of the subList.
      * @param toIndex  high endpoint (exclusive) of the subList. 
      * @return  a view of the specified range within this list. 
@@ -363,7 +429,10 @@ public class List implements HList {
 
     /**
      * Returns an array containing all of the elements in this listin proper sequence.
-     * The returned array will be "safe" in that no references to it are maintained by this list. (In other words, this method must allocate a new array even if this list is backed by an array). The caller is thus free to modify the returned array.
+     * The returned array will be "safe" in that no references to it are maintained 
+     * by this list. (In other words, this method must allocate a new array even 
+     * if this list is backed by an array). The caller is thus free to modify the 
+     * returned array.
      * @return  an array containing all of the elements in this list.
      */
     @Override
@@ -375,10 +444,20 @@ public class List implements HList {
 
     /**
      * Returns an array containing all of the elements in this list in proper sequence.
-     * The runtime type of the returned array is that of the specified array if a parameter is big enough to contain all the elements of this list (all the elements of the list are copied inside the a parameter).
-     * If a is not big enough, a new Object[] array will be instantiated, and the return array won't be of the specified array type.
-     * The returned array will be "safe" in that no references to it are maintained by this list. (In other words, this method must allocate a new array even if this list is backed by an array). The caller is thus free to modify the returned array.
-     * If the parameter a is big enough to contain all the element of this list, the elements will be stored in the parametric array. Only the first size() cell of the array will be written, the others will mantain their actual value.
+     * The runtime type of the returned array is that of the specified array if 
+     * a parameter is big enough to contain all the elements of this list (all 
+     * the elements of the list are copied inside the a parameter).
+     * 
+     * If parameter a is not big enough, a new Object[] array will be instantiated, 
+     * and the return array won't be of the specified array type.
+     * The returned array will be "safe" in that no references to it are maintained 
+     * by this list. (In other words, this method must allocate a new array even 
+     * if this list is backed by an array). The caller is thus free to modify the
+     * returned array.
+     * 
+     * If the parameter a is big enough to contain all the element of this list, 
+     * the elements will be stored in the parametric array. Only the first size() 
+     * cell of the array will be written, the others will mantain their actual value.
      * @param a the array into which the elements of this list are to be stored, if it is big enough 
      * @return an array containing the elements of this list. 
      * @throws NullPointerException if the parameter is null
