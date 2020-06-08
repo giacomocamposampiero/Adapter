@@ -16,6 +16,10 @@ public class Map implements HMap {
     
     Hashtable table;
 
+    /**
+     * Empty constructor.
+     * This constructor will initialize a new empty map.
+     */
     public Map() {
         table = new Hashtable();
     }

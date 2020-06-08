@@ -19,6 +19,10 @@ public class List implements HList {
 
     private final Vector vec;
 
+    /**
+     * Empty constructor.
+     * This constructor will initialize a new empty list.
+     */
     public List() {
         vec = new Vector();
     }

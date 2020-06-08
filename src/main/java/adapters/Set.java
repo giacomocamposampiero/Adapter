@@ -16,13 +16,13 @@ import java.util.NoSuchElementException;
 public class Set implements HSet{
 
     Hashtable table;
-
+    
+    /**
+     * Empty constructor.
+     * This constructor will initialize an empty set, with no elements contained.
+     */
     public Set() {
         this.table = new Hashtable();
-    }
-    
-    public Set(int initialCapacity) {
-        this.table = new Hashtable(initialCapacity);
     }
     
     /**
