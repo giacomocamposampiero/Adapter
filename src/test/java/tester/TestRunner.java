@@ -7,6 +7,7 @@ import org.junit.runner.notification.Failure;
 public class TestRunner {
 
     public static void main(String[] args) {
+        int succ = 0, fail = 0, ign = 0;
         System.out.println("\nAvvio dei test... ");
         System.out.println("___________________\n");
         String[] test = {"tester.MapTest", "tester.ListTest", "tester.SetTest", "tester.CollectionTest"};
@@ -25,7 +26,11 @@ public class TestRunner {
             System.out.println("Test successful: " + result.wasSuccessful()+".");
             System.out.println("Test statistics: "+(result.getRunCount()-result.getFailureCount())+" succeeded, "+result.getIgnoreCount()+" ignored, "+result.getFailureCount()+" failed.");
             System.out.println("___________________\n");
+            succ += result.getRunCount()-result.getFailureCount();
+            fail += result.getFailureCount();
+            ign += result.getIgnoreCount();
         }
+        System.out.println("Totale test eseguiti: "+succ+" succeded, "+fail+" failed, "+ign+" ignored.\n");
     }
     
 }
