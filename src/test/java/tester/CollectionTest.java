@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.NoSuchElementException;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -106,12 +105,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance isn't directly modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testAdd_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.add(null);
-                });
+        instance.add(null);
     }
     
     /**
@@ -205,12 +201,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance has not to be modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testAddAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
+        instance.containsAll(null);
     }
     
     /**
@@ -320,12 +313,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be directly modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testContains_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.contains(null);
-                });
+        instance.contains(null);
     }
     
     /**
@@ -369,6 +359,7 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test
     public void testContainsAll_notContainedSet() {
         HCollection param = new Set();
         param.add("pippo");
@@ -387,6 +378,7 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test
     public void testContainsAll_notContainedList() {
         HCollection param = new List();
         param.add("pippo");
@@ -406,6 +398,7 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test
     public void testContainsAll_containedParam() {
         HCollection param = new List();
         instance.add("pluto");
@@ -426,6 +419,7 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test
     public void testContainsAll_partiallyContainedParam() {
         HCollection param = new Set();
         param.add("topolino");
@@ -446,6 +440,7 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test
     public void testContainsAll_emptyParam() {
         HCollection param = new Set();
         instance.add("pluto");
@@ -462,11 +457,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance doesn't have to be modified by the execution of the method tested.
      */
+    @Test(expected = NullPointerException.class)
     public void testContainsAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsAll(null);
-                });
+        instance.containsAll(null);
     }
     
     /**
@@ -644,25 +637,42 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance should not be modified by the execution of the method.
      */
-    @Test
-    public void testIterator_exceptions() {
-        assertThrows("l'iteratore non ha un elemento successivo", NoSuchElementException.class,
-                () -> {
-                    instance.iterator().next();
-                });
-        assertThrows("remove invocato prima di next", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.add("pippo");
-                    instance.iterator().remove();
-                });
-        assertThrows("remove invocato due volte sullo stesso elemento", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.add("pippo");
-                    HIterator iter = instance.iterator();
-                    iter.next();
-                    iter.remove();
-                    iter.remove();
-                });
+    @Test(expected = NoSuchElementException.class)
+    public void testIterator_exception1() {
+        instance.iterator().next();
+    }
+    
+    /**
+     * @title Test #7 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, the trowing of expected exceptions is tested: NoSuchElementException if next() is called but hasNext() is false; IllegalStateException if remove() is called before next() or if remove() is called another remove() without performing a next() before.
+     * @expectedResults The expected exceptions should be thrown in the conditions listed above.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testIterator_exception2() {
+        instance.add("pippo");
+        instance.iterator().remove();
+    }
+    
+    /**
+     * @title Test #8 of iterator method, of an istance of a class which implements Collection interface.
+     * @description This test tests the behaviour of the iterator returned by iterator() method. More in details, the trowing of expected exceptions is tested: NoSuchElementException if next() is called but hasNext() is false; IllegalStateException if remove() is called before next() or if remove() is called another remove() without performing a next() before.
+     * @expectedResults The expected exceptions should be thrown in the conditions listed above.
+     * @actualResult As expected result.
+     * @dependencies This test correctness depends on the correctness of method add().
+     * @preConditions The collection instance must be a new istance of Collection.
+     * @postConditions The collection instance should not be modified by the execution of the method.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testIterator_exception3() {
+        instance.add("pippo");
+        HIterator iter = instance.iterator();
+        iter.next();
+        iter.remove();
+        iter.remove();
     }
     
     /**
@@ -754,12 +764,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance should not be modified directly by the execution of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testRemove_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.remove(null);
-                });
+        instance.remove(null);
     }
     
     /**
@@ -849,12 +856,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance should not be modified directly by the execution of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testRemoveAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.removeAll(null);
-                });
+        instance.removeAll(null);
     }
     
     /**
@@ -968,12 +972,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance should be directly modified by the execution of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testRetainAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.retainAll(null);
-                });
+        instance.retainAll(null);
     }
     
     /**
@@ -1136,12 +1137,9 @@ public class CollectionTest {
      * @preConditions The collection instance must be a new istance of Collection.
      * @postConditions The collection instance should not be directly modified by the call of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testParametricToArray_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.toArray(null);
-                });
+        instance.toArray(null);
     }
 
 }

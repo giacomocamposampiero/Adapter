@@ -143,7 +143,7 @@ public class List implements HList {
         boolean res = true;
         HIterator it = c.iterator();
         while (it.hasNext()) {
-            res = res && contains(it.next());
+            res = contains(it.next()) && res;
         }
         return res;
     }

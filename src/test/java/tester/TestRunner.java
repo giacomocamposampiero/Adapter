@@ -7,7 +7,8 @@ import org.junit.runner.notification.Failure;
 public class TestRunner {
 
     public static void main(String[] args) {
-        System.out.println("Avvio dei test... \n\n");
+        System.out.println("\nAvvio dei test... ");
+        System.out.println("___________________\n");
         String[] test = {"tester.MapTest", "tester.ListTest", "tester.SetTest", "tester.CollectionTest"};
         for (String name : test) {
             Class clazz = null;

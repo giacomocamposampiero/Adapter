@@ -185,20 +185,37 @@ public class ListTest {
      * @preConditions The collection instance must be a new istance of List.
      * @postConditions The collection instance is not directly modified by the execution of the method tested.
      */
-    @Test
-    public void testParametricAdd_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.add(0, null);
-                });
-        assertThrows("si specifica una posizione > size()", IndexOutOfBoundsException.class,
-                () -> {
+    @Test(expected = NullPointerException.class)
+    public void testParametricAdd_exception1() {
+        instance.add(0, null);
+    }
+    
+    /**
+     * @title Test #6 of parametric add method, of class List.
+     * @description This test tests the behaviour of the method add() when an invalid parameter is used. More in details, the method is expected to throw a NullPointerException when the object to add is a null reference and a IndexOutOfBoundsException when the specified index is <0 or >size().
+     * @expectedResults The add method is expected to throw the specified exceptions in the situations described above..
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method).
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is not directly modified by the execution of the method tested.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricAdd_exception2() {
                     instance.add(100000, "pippo");
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.add(-20, "pippo");
-                });
+    }
+    
+    /**
+     * @title Test #7 of parametric add method, of class List.
+     * @description This test tests the behaviour of the method add() when an invalid parameter is used. More in details, the method is expected to throw a NullPointerException when the object to add is a null reference and a IndexOutOfBoundsException when the specified index is <0 or >size().
+     * @expectedResults The add method is expected to throw the specified exceptions in the situations described above..
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method).
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is not directly modified by the execution of the method tested.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricAdd_exception3() {
+        instance.add(-20, "pippo");
     }
     
     /**
@@ -344,20 +361,37 @@ public class ListTest {
      * @preConditions The collection instance must be a new istance of List.
      * @postConditions The collection instance is not directly modified by the execution of the method tested.
      */
-    @Test
-    public void testParametricAddAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.addAll(null);
-                });
-        assertThrows("si specifica una posizione >> size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.addAll(100000, new List());
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.addAll(-20, new List());
-                });
+    @Test(expected = NullPointerException.class)
+    public void testParametricAddAll_exception1() {
+        instance.addAll(null);         
+    }
+    
+    /**
+     * @title Test #6 of parametric addAll method, of class List.
+     * @description This test tests the behaviour of the method addAll() when an invalid parameter is used. More in details, the method is expected to throw a NullPointerException when the object to add is a null reference and a IndexOutOfBoundsException when the specified index is <0 or >size().
+     * @expectedResults The add method is expected to throw the specified exceptions in the situations described above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method).
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is not directly modified by the execution of the method tested.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricAddAll_exception2() {
+        instance.addAll(100000, new List());
+    }
+    
+    /**
+     * @title Test #7 of parametric addAll method, of class List.
+     * @description This test tests the behaviour of the method addAll() when an invalid parameter is used. More in details, the method is expected to throw a NullPointerException when the object to add is a null reference and a IndexOutOfBoundsException when the specified index is <0 or >size().
+     * @expectedResults The add method is expected to throw the specified exceptions in the situations described above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of any other method).
+     * @preConditions The collection instance must be a new istance of List.
+     * @postConditions The collection instance is not directly modified by the execution of the method tested.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricAddAll_exception3() {
+        instance.addAll(-20, new List());
     }
   
     /**
@@ -539,16 +573,23 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be modified directly by the execution of the method.
      */
-    @Test
-    public void testGet_exeptions() {
-        assertThrows("si specifica una posizione >= size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.get(instance.size());
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.get(-20);
-                });
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testGet_exception1() {
+        instance.get(instance.size());
+    }
+    
+    /**
+     * @title Test #2 of get method, of class List.
+     * @description This test tests the behaviour of get() method when param are invalid. The method should throw an IndexOutOfBoundsException if the specified index is less than 0 or >= size().
+     * @expectedResults The method should throw the expected exception.
+     * @actualResult As expected result.
+     * @dependencies Depends on the correctness of methods add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified directly by the execution of the method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testGet_exception2() {
+        instance.get(-20);
     }
 
     /**
@@ -611,12 +652,9 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be modified directly by the execution of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testIndexOf_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.indexOf(null);
-                });
+        instance.indexOf(null);
     }
     
     /**
@@ -679,12 +717,9 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be modified directly by the execution of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testLastIndexOf_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.lastIndexOf(null);
-                });
+        instance.lastIndexOf(null);
     }
 
     //ONLY ITERATOR FUCNTIONS THAT ARE NOT TESTED BY COLLECTION TEST SUITE ARE TESTED HERE
@@ -847,41 +882,78 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be modified by the direct execution of the tested method.
      */
-    @Test
-    public void testListIterator_exceptions() {
+    @Test(expected = IllegalArgumentException.class)
+    public void testListIterator_exception1() {
         //add
-        assertThrows("metodo invocato con parametro null", IllegalArgumentException.class,
-                () -> {
-                    HListIterator it = instance.listIterator();
-                    it.add(null);
-                });
+        HListIterator it = instance.listIterator();
+        it.add(null);
+    }
+    
+    /**
+     * @title Test #8 of listIterator method, of class List.
+     * @description This test tests the behaviour of the ListIterator returned by listIterator() method. More in details, it tests exceptions thrown by the object. IllegalArgumentException is thrown by the method add when is called with a null reference as parameter. NoSuchElementException is thrown by next or before if there is not a next or befor element. IllegalStateException is thrown by set method if the current element of the iterator has been removed or it wasn't called next() or previous() before, IllegalArgumentException thrown if the parameter is a null reference. IllegalStateException is thrown by the method if the current element was already removed or if it wasn't called next() method yet.
+     * @expectedResults A listiterator should throw exceptions when used in specific ways, defined above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified by the direct execution of the tested method.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void testListIterator_exception2() {
         //previous
-        assertThrows("non esiste un elemento precedente", NoSuchElementException.class,
-                () -> {
-                    HListIterator it = instance.listIterator();
-                    it.previous();
-                });
+        HListIterator it = instance.listIterator();
+        it.previous();
+    }
+    
+    /**
+     * @title Test #9 of listIterator method, of class List.
+     * @description This test tests the behaviour of the ListIterator returned by listIterator() method. More in details, it tests exceptions thrown by the object. IllegalArgumentException is thrown by the method add when is called with a null reference as parameter. NoSuchElementException is thrown by next or before if there is not a next or befor element. IllegalStateException is thrown by set method if the current element of the iterator has been removed or it wasn't called next() or previous() before, IllegalArgumentException thrown if the parameter is a null reference. IllegalStateException is thrown by the method if the current element was already removed or if it wasn't called next() method yet.
+     * @expectedResults A listiterator should throw exceptions when used in specific ways, defined above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified by the direct execution of the tested method.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testListIterator_exception3() {
         //set
-        assertThrows("parametro è null", IllegalArgumentException.class,
-                () -> {
-                    instance.add("pippo");
-                    HListIterator it = instance.listIterator();
-                    it.next();
-                    it.set(null);
-                });
-        assertThrows("next non ancora invocato", exceptions.IllegalStateException.class,
-                () -> {
-                    HListIterator it = instance.listIterator();
-                    it.set("pippo");
-                });
-        assertThrows("next non ancora invocato", exceptions.IllegalStateException.class,
-                () -> {
-                    instance.add("pippo");
-                    HListIterator it = instance.listIterator();
-                    it.next();
-                    it.remove();
-                    it.set("pluto");
-                });
+        instance.add("pippo");
+        HListIterator it = instance.listIterator();
+        it.next();
+        it.set(null);
+    }
+    
+    /**
+     * @title Test #10 of listIterator method, of class List.
+     * @description This test tests the behaviour of the ListIterator returned by listIterator() method. More in details, it tests exceptions thrown by the object. IllegalArgumentException is thrown by the method add when is called with a null reference as parameter. NoSuchElementException is thrown by next or before if there is not a next or befor element. IllegalStateException is thrown by set method if the current element of the iterator has been removed or it wasn't called next() or previous() before, IllegalArgumentException thrown if the parameter is a null reference. IllegalStateException is thrown by the method if the current element was already removed or if it wasn't called next() method yet.
+     * @expectedResults A listiterator should throw exceptions when used in specific ways, defined above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified by the direct execution of the tested method.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testListIterator_exception4() {
+        HListIterator it = instance.listIterator();
+        it.set("pippo");
+    }
+    
+    /**
+     * @title Test #11 of listIterator method, of class List.
+     * @description This test tests the behaviour of the ListIterator returned by listIterator() method. More in details, it tests exceptions thrown by the object. IllegalArgumentException is thrown by the method add when is called with a null reference as parameter. NoSuchElementException is thrown by next or before if there is not a next or befor element. IllegalStateException is thrown by set method if the current element of the iterator has been removed or it wasn't called next() or previous() before, IllegalArgumentException thrown if the parameter is a null reference. IllegalStateException is thrown by the method if the current element was already removed or if it wasn't called next() method yet.
+     * @expectedResults A listiterator should throw exceptions when used in specific ways, defined above.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified by the direct execution of the tested method.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testListIterator_exception5() {
+        instance.add("pippo");
+        HListIterator it = instance.listIterator();
+        it.next();
+        it.remove();
+        it.set("pluto");
     }
     
     /**
@@ -908,6 +980,20 @@ public class ListTest {
     }
     
     /**
+     * @title Test #1 of parametric listIterator method, of class List.
+     * @description This test tests the behaviour of the ListIterator returned by the parametric listIterator method when a bad type of parameter is used (tests exceptions)
+     * @expectedResults A listiterator should throw exceptions when the index specified does not respect the boundary of the list (less than 0 or >= size())
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be modified by the direct execution of the tested method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricListIterator_exception1() {
+        instance.listIterator(-1);
+    }
+    
+    /**
      * @title Test #2 of parametric listIterator method, of class List.
      * @description This test tests the behaviour of the ListIterator returned by the parametric listIterator method when a bad type of parameter is used (tests exceptions)
      * @expectedResults A listiterator should throw exceptions when the index specified does not respect the boundary of the list (less than 0 or >= size())
@@ -916,16 +1002,9 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be modified by the direct execution of the tested method.
      */
-    @Test
-    public void testParametricListIterator_exceptions() {
-        assertThrows("index is < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    HListIterator it = instance.listIterator(-1);
-                });
-        assertThrows("index is >= size", IndexOutOfBoundsException.class,
-                () -> {
-                    HListIterator it = instance.listIterator(instance.size()+1);
-                });
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testParametricListIterator_exception2() {
+        instance.listIterator(instance.size()+1);
     }
 
     /**
@@ -977,17 +1056,23 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be directly modified  by the execution of the method.
      */
-    @Test
-    public void testRemoveInt_exceptions() {
-        //controllo eccezioni
-        assertThrows("si specifica una posizione >= size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.remove(instance.size());
-                });
-        assertThrows("si specifica una posizione < 0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.remove(-20);
-                });
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testRemoveInt_exception1() {
+        instance.remove(instance.size());
+    }
+    
+    /**
+     * @title Test #4 of remove(int) method, of Class list.
+     * @description This test tests the behaviour of remove(int) method when called using an invalid parameter.
+     * @expectedResults The method should throw an IndexOutOfBoundsException if the specified index is less than 0 or >= size().
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test depends on the correctness of methods add().
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be directly modified  by the execution of the method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testRemoveInt_exception12() {
+        instance.remove(-20);
     }
 
     /**
@@ -1066,23 +1151,40 @@ public class ListTest {
      * @preConditions The list instance must be a new istance of List.
      * @postConditions The list instance should not be directly modified  by the execution of the method.
      */
-    @Test
-    public void testSet_invalid() {
-        assertThrows("parametro element null", NullPointerException.class,
-                () -> {
-                    instance.add("pippo");
-                    instance.set(0, null);
-                });
-        assertThrows("si specifica una posizione <0", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.add("pippo");
-                    instance.set(-1, "pippo");
-                });
-        assertThrows("si specifica una posizione >=size()", IndexOutOfBoundsException.class,
-                () -> {
-                    instance.add("pippo");
-                    instance.set(instance.size(), "pippo");
-                });
+    @Test(expected = NullPointerException.class)
+    public void testSet_exception1() {
+        instance.add("pippo");
+        instance.set(0, null);
+    }
+    
+    /**
+     * @title Test #3 of set method, of Class list.
+     * @description This test tests the behaviour of set() method when called using invalid parameters.
+     * @expectedResults The method is expected to throw a NullPointerException if the new value is a null reference, IndexOutOfBoundsException if the specified index is less than 0 or >=size().
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be directly modified  by the execution of the method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testSet_exception2() {
+        instance.add("pippo");
+        instance.set(-1, "pippo");
+    }
+    
+    /**
+     * @title Test #4 of set method, of Class list.
+     * @description This test tests the behaviour of set() method when called using invalid parameters.
+     * @expectedResults The method is expected to throw a NullPointerException if the new value is a null reference, IndexOutOfBoundsException if the specified index is less than 0 or >=size().
+     * @actualResult As expected result.
+     * @dependencies The correctness of this test does not depends on the correctness of other methods.
+     * @preConditions The list instance must be a new istance of List.
+     * @postConditions The list instance should not be directly modified  by the execution of the method.
+     */
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testSet_exception3() {
+        instance.add("pippo");
+        instance.set(instance.size(), "pippo");
     }
 
     /**

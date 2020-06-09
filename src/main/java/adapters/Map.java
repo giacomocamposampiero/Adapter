@@ -254,7 +254,7 @@ public class Map implements HMap {
         return new ElementSet(false);
     }
     
-    class MapEntry implements HMap.Entry {
+    public class MapEntry implements HMap.Entry {
         
         private final Object key;
         private Object value;
@@ -388,11 +388,6 @@ public class Map implements HMap {
             return true;
         }
 
-        /**
-         * Returns the hash code value for this set.
-         * The hash code of a set is defined to be the sum of the hash codes of the elements in the set, where the hashcode of a null element is defined to be zero. This ensures that s1.equals(s2) implies that s1.hashCode()==s2.hashCode() for any two sets s1 and s2, as required by the general contract of the Object.hashCode method. 
-         * @return  the hash code value for this set.
-         */
         @Override 
         public int hashCode() {
             int hash = 0;
@@ -491,7 +486,8 @@ public class Map implements HMap {
             public Object next() {
                 if(!hasNext()) throw new NoSuchElementException();   
                 Object key = keys.nextElement();
-                return new Map.MapEntry(key, table.get(key));
+                current = new Map.MapEntry(key, table.get(key));
+                return current;
             }
 
             @Override
@@ -531,12 +527,37 @@ public class Map implements HMap {
 
         @Override
         public boolean containsAll(HCollection c) {
+            if(c == null) throw new NullPointerException();
             boolean contained = true;
             HIterator it = c.iterator();
             while(it.hasNext()) {
                 contained &= contains(it.next());
             }
             return contained;
+        }
+        
+        @Override 
+        public boolean equals(Object o) {
+            if (o == this) return true; 
+            if (!(o.getClass().equals(this.getClass()))) { 
+                return false; 
+            }    
+            ElementSet other = (ElementSet) o;
+            if (other.size() != size()) return false;
+            HIterator it = iterator();
+            while(it.hasNext())
+                if(!other.contains(it.next())) 
+                    return false;
+            return true;
+        }
+
+        @Override 
+        public int hashCode() {
+            int hash = 0;
+            HIterator it = iterator();
+            while(it.hasNext()) 
+                hash += it.next().hashCode();
+            return hash;
         }
 
         @Override
@@ -546,6 +567,7 @@ public class Map implements HMap {
 
         @Override
         public boolean contains(Object o) {
+            if(o == null) throw new NullPointerException();
             if(type) return containsKey(o);
             return containsValue(o);
         }

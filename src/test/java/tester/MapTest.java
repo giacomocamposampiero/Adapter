@@ -1,7 +1,12 @@
 package tester;
 
+import adapters.List;
 import adapters.Map;
+import interfaces.HCollection;
+import interfaces.HIterator;
 import interfaces.HMap;
+import interfaces.HSet;
+import java.util.NoSuchElementException;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -131,12 +136,9 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testContainsKey_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsKey(null);
-                });
+        instance.containsKey(null);
     }
 
     /**
@@ -195,12 +197,351 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testContainsValue_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.containsValue(null);
-                });
+        instance.containsValue(null);
+    }
+    
+    /**
+     * @title Test #1 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method when called on an empty map.
+     * @expectedResults The set is expected to be empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method isEmpty.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testEntry_empty() {
+        HSet entries = instance.entrySet();
+        assertEquals("una mappa vuota non ha entry", true, entries.isEmpty());
+    }
+    
+    /**
+     * @title Test #2 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method when called on a not-empty map.
+     * @expectedResults The set size is expected to equals to the number of entries previously putted in the map. The set is also expected to contain all the entries contained by the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods put, isEmpty and contains.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testEntry_notEmpty() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "asso");
+        HSet entries = instance.entrySet();
+        assertEquals("la dimensione del set deve equivalere al numero di entry inserite", 2, entries.size());
+        assertEquals("il deve contenere effettivamente le entry", true, entries.contains(instance.new MapEntry("pippo", "pluto")) && entries.contains(instance.new MapEntry("masso", "asso")));
+    }
+    
+    /**
+     * @title Test #3 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method when called on a not-empty map which contains duplicate values.
+     * @expectedResults The set size is expected to equals to the number of entries previously putted in the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods size and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testEntry_duplicates() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "pluto");
+        instance.put("basso", "pippo");
+        HSet entries = instance.entrySet();
+        assertEquals("la dimensione della collezione deve equivalere al numero di entry inserite", 3, entries.size());
+    }
+    
+    /**
+     * @title Test #4 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, this test that the new set returned is backed to the map and that, if a structural modification is performed in the set, it is reflected in the map too.
+     * @expectedResults The modifications to the returned set must be reflected to the main map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, isEmpty, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testEntry_backed() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        HSet entries = instance.entrySet();
+        entries.remove(instance.new MapEntry("pippo", "pluto"));
+        assertEquals("modifica apportata al set", 2, entries.size());
+        assertEquals("il set riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsKey("pippo") && instance.containsValue("pluto"));
+        HCollection param = new List();
+        param.add(instance.new MapEntry("paperino", "topolino"));
+        param.add(instance.new MapEntry("pranzo", "cena"));
+        entries.removeAll(param);
+        assertEquals("modifica apportata al set", 1, entries.size());
+        assertEquals("il set riflette la rimozione sulla mappa", 1, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsKey("paperino") && instance.containsValue("topolino"));
+        entries.retainAll(param);
+        assertEquals("modifica apportata al set", true, entries.isEmpty());
+        assertEquals("il set riflette la rimozione sulla mappa", true, instance.isEmpty());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsKey("masso") && instance.containsValue("asso"));
+    }
+    
+    /**
+     * @title Test #5 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the iterator of the set of entries returned.
+     * @expectedResults The iterator must be capable of iterating all map entries and the modifications performed by the iterator should be reflected to the main map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testEntry_iterator() {
+        HIterator it = instance.entrySet().iterator();
+        assertEquals("l'iteratore delle entry di una mappa vuota non deve avere next", false, it.hasNext());
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        it = instance.entrySet().iterator();
+        int i = 0;
+        Object second = null;
+        while(it.hasNext()){
+            Map.Entry tmp = (Map.Entry) it.next();
+            if(i==1) {
+                second = tmp;
+            }
+            assertEquals("l'elemento restituito dall'iteratore è contenuto nella mappa", true, instance.containsKey(tmp.getKey()) && instance.containsValue(tmp.getValue()));
+            i++;
+        }
+        it = instance.entrySet().iterator();
+        Map.Entry removed = (Map.Entry) it.next();
+        it.remove();
+        assertEquals("la collezione riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsKey(removed.getKey()));
+        assertEquals("elemento successivo coerente", second, it.next()); 
+    }
+    
+    /**
+     * @title Test #6 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it test hashCode and equals method of the returned set of entries.
+     * @expectedResults Two entry set should equals when one of them contains all and only the elements of the other. hashcode and equals should be coherents.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testntry_equalsHash() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        Map other = new Map();
+        other.put("pippo", "pluto");
+        other.put("paperino", "topolino");
+        assertEquals("dovrebbero equivalere", true, instance.entrySet().equals(other.entrySet()));
+        assertEquals("stessi hash", true, instance.entrySet().hashCode()==other.entrySet().hashCode());
+        instance.put("asso", "bello");
+        assertEquals("non dovrebbero equivalere", false, instance.entrySet().equals(other.entrySet()));
+        assertEquals("non dovrebbero avere gli stessi hash", false, instance.entrySet().hashCode()==other.entrySet().hashCode());
+    }
+    
+    /**
+     * @title Test #7 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests clear method of the returned set.
+     * @expectedResults The clear method should delete all the entries of the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method tested.
+     */
+    @Test
+    public void testEntry_clear() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HSet entries = instance.entrySet();
+        entries.clear();
+        assertEquals("la mappa dovrebbe essere vuota", true, instance.isEmpty());
+        assertEquals("la collezione deve essere vuota", true, entries.isEmpty());
+    }
+    
+    /**
+     * @title Test #8 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests containsAll method of the returned set.
+     * @expectedResults The method should correctly verify if a collection of entries is contained or not in the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testEntry_containsAll() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HCollection param = new List();
+        param.add(instance.new MapEntry("pippo", "pluto"));
+        param.add(instance.new MapEntry("paperino", "topolino"));
+        HSet entries = instance.entrySet();
+        assertEquals("tutte le entry sono contenute", true, entries.containsAll(param));
+        param.add(instance.new MapEntry("basso", "razzo"));
+        assertEquals("non tutte le entry sono contenuti", false, entries.containsAll(param));
+    }
+    
+    /**
+     * @title Test #9 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testEntry_exception1() {
+        instance.entrySet().add("pippo");
+    }
+    
+    /**
+     * @title Test #10 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testEntry_exception2() {
+        instance.entrySet().addAll(new List());
+    }
+    
+    /**
+     * @title Test #11 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception3() {
+        instance.entrySet().containsAll(null);
+    }
+    
+    /**
+     * @title Test #12 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception4() {
+        instance.entrySet().contains(null);
+    }
+    
+    /**
+     * @title Test #13 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception5() {
+        instance.entrySet().remove(null);
+    }
+    
+    /**
+     * @title Test #14 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception6() {
+        instance.entrySet().removeAll(null);
+    }
+    
+    /**
+     * @title Test #15 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception7() {
+        instance.entrySet().retainAll(null);
+    }
+    
+    /**
+     * @title Test #16 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testEntry_exception8() {
+        instance.entrySet().toArray(null);
+    }
+    
+    /**
+     * @title Test #17 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void testEntry_exception9() {
+        instance.entrySet().iterator().next();
+    }
+    
+    /**
+     * @title Test #18 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testEntry_exception10() {
+        instance.entrySet().iterator().remove();
+    }
+    
+    /**
+     * @title Test #19 of entrySet method, of class Map.
+     * @description This test tests the behaviour of entrySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testEntry_exception11() {
+        instance.put("pippo", "pluto");
+        HIterator it = instance.entrySet().iterator();
+        it.next();
+        it.remove();
+        it.remove();
     }
     
     /**
@@ -309,15 +650,6 @@ public class MapTest {
         boolean result = instance.equals(other);
         assertEquals("mappe aventi lo stesso set di values, ma keys differenti", false, result);    
     }
-    
-    /**
-     * @title Test of entrySet method, of class Map.
-     */
-    @Test
-    public void testEntrySet() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
     /**
      * @title Test #1 of get method, of class Map.
@@ -391,12 +723,9 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testGet_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.get(null);
-                });
+        instance.get(null);
     }
     
     /**
@@ -503,12 +832,348 @@ public class MapTest {
     }
     
     /**
-     * @title Test of keySet method, of class Map.
+     * @title Test #1 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method when called on an empty map.
+     * @expectedResults The set is expected to be empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method isEmpty.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
      */
     @Test
-    public void testKeySet() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testKeys_empty() {
+        HSet keys = instance.keySet();
+        assertEquals("una mappa vuota non ha chiavi", true, keys.isEmpty());
+    }
+    
+    /**
+     * @title Test #2 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method when called on a not-empty map.
+     * @expectedResults The set size is expected to equals to the number of entries previously putted in the map. The set is also expected to contain all the keys contained by the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods put, isEmpty and contains.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testKeys_notEmpty() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "asso");
+        HSet keys = instance.keySet();
+        assertEquals("la dimensione del set deve equivalere al numero di entry inserite", 2, keys.size());
+        assertEquals("il deve contenere effettivamente le chiavi", true, keys.contains("pippo")&&keys.contains("masso"));
+    }
+    
+    /**
+     * @title Test #3 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method when called on a not-empty map which contains duplicate values.
+     * @expectedResults The set size is expected to equals to the number of entries previously putted in the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods size and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testKeys_duplicates() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "pluto");
+        instance.put("basso", "pippo");
+        HSet keys = instance.keySet();
+        assertEquals("la dimensione della collezione deve equivalere al numero di entry inserite", 3, keys.size());
+    }
+    
+    /**
+     * @title Test #4 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, this test that the new set returned is backed to the map and that, if a structural modification is performed in the set, it is reflected in the map too.
+     * @expectedResults The iterator must be able to iterate all the map, and the changes performed by the iterator must be reflected to the main map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, isEmpty, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testKeys_backed() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        HSet keys = instance.keySet();
+        keys.remove("pippo");
+        assertEquals("modifica apportata al set", 2, keys.size());
+        assertEquals("il set riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("pippo"));
+        HCollection param = new List();
+        param.add("topolino");
+        param.add("paperino");
+        keys.removeAll(param);
+        assertEquals("modifica apportata al set", 1, keys.size());
+        assertEquals("il set riflette la rimozione sulla mappa", 1, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("paperino"));
+        keys.retainAll(param);
+        assertEquals("modifica apportata al set", true, keys.isEmpty());
+        assertEquals("il set riflette la rimozione sulla mappa", true, instance.isEmpty());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("masso"));
+    }
+    
+    /**
+     * @title Test #5 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the iterator of the set of keys returned.
+     * @expectedResults The iterator must be capable of iterating all map keys and the modifications performed by the iterator should be reflected to the main map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testKeys_iterator() {
+        HIterator it = instance.keySet().iterator();
+        assertEquals("l'iteratore delle chiavi di una mappa vuota non deve avere next", false, it.hasNext());
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        it = instance.keySet().iterator();
+        int i = 0;
+        Object second = null;
+        while(it.hasNext()){
+            if(i==1) {
+                second = it.next();
+                assertEquals("l'elemento restituito dall'iteratore è contenuto nella mappa", true, instance.containsKey(second));
+            } else {
+                assertEquals("l'elemento restituito dall'iteratore è contenuto nella mappa", true, instance.containsKey(it.next()));
+            }
+            i++;
+            
+        }
+        it = instance.keySet().iterator();
+        Object removed = it.next();
+        it.remove();
+        assertEquals("la collezione riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsKey(removed));
+        assertEquals("elemento successivo coerente", second, it.next()); 
+    }
+    
+    /**
+     * @title Test #6 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it test hashCode and equals method of the returned collection.
+     * @expectedResults Two values set should equals when one of them contains all the elements of the other. hashcode and equals should be coherents.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testKeys_equalsHash() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        Map other = new Map();
+        other.put("pippo", "bufu");
+        other.put("paperino", "topolino");
+        assertEquals("dovrebbero equivalere", true, instance.keySet().equals(other.keySet()));
+        assertEquals("stessi hash", true, instance.keySet().hashCode()==other.keySet().hashCode());
+        instance.put("asso", "bello");
+        assertEquals("non dovrebbero equivalere", false, instance.keySet().equals(other.keySet()));
+        assertEquals("non dovrebbero avere gli stessi hash", false, instance.keySet().hashCode()==other.keySet().hashCode());
+    }
+    
+    /**
+     * @title Test #7 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests clear method of the returned set.
+     * @expectedResults The clear method should delete all the entries of the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method tested.
+     */
+    @Test
+    public void testKeys_clear() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HSet keys = instance.keySet();
+        keys.clear();
+        assertEquals("la mappa dovrebbe essere vuota", true, instance.isEmpty());
+        assertEquals("la collezione deve essere vuota", true, keys.isEmpty());
+    }
+    
+    /**
+     * @title Test #8 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests containsAll method of the returned set.
+     * @expectedResults The method should correctly verify if a collection of keys is contained or not in the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testKeys_containsAll() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HCollection param = new List();
+        param.add("pippo");
+        param.add("masso");
+        HSet keys = instance.keySet();
+        assertEquals("non tutte le chiavi sono contenuti", false, keys.containsAll(param));
+        param.remove("masso");
+        param.add("asso");
+        assertEquals("tutte le chiave sono contenuti", true, keys.containsAll(param));
+    }
+    
+    /**
+     * @title Test #9 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testKeys_exception1() {
+        instance.keySet().add("pippo");
+    }
+    
+    /**
+     * @title Test #10 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testKeys_exception2() {
+        instance.keySet().addAll(new List());
+    }
+    
+    /**
+     * @title Test #11 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception3() {
+        instance.keySet().containsAll(null);
+    }
+    
+    /**
+     * @title Test #12 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception4() {
+        instance.keySet().contains(null);
+    }
+    
+    /**
+     * @title Test #13 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception5() {
+        instance.keySet().remove(null);
+    }
+    
+    /**
+     * @title Test #14 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception6() {
+        instance.keySet().removeAll(null);
+    }
+    
+    /**
+     * @title Test #15 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception7() {
+        instance.keySet().retainAll(null);
+    }
+    
+    /**
+     * @title Test #16 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testKeys_exception8() {
+        instance.keySet().toArray(null);
+    }
+    
+    /**
+     * @title Test #17 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void testKeys_exception9() {
+        instance.keySet().iterator().next();
+    }
+    
+    /**
+     * @title Test #18 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testKeys_exception10() {
+        instance.keySet().iterator().remove();
+    }
+    
+    /**
+     * @title Test #19 of keySet method, of class Map.
+     * @description This test tests the behaviour of keySet() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testKeys_exception11() {
+        instance.put("pippo", "pluto");
+        HIterator it = instance.keySet().iterator();
+        it.next();
+        it.remove();
+        it.remove();
     }
 
     /**
@@ -589,20 +1254,37 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
      */
-    @Test
-    public void testPut_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.put(null,"pippo");
-                });
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.put("pippo", null);
-                });
-        assertThrows("entrambi i parametri sono riferimenti a null", NullPointerException.class,
-                () -> {
-                    instance.put(null, null);
-                });
+    @Test(expected = NullPointerException.class)
+    public void testPut_exception1() {
+        instance.put(null,"pippo");
+    }
+    
+    /**
+     * @title Test #6 of put method, of class Map.
+     * @description This test tests the behaviour of put() method when is called on a Map using as parameter a null reference (NullPointerException expected)
+     * @expectedResults The map is expected to throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies  This test doesn't depend on the correctness of any other method of the class.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPut_exception2() {
+        instance.put("pippo", null);
+    }
+    
+    /**
+     * @title Test #7 of put method, of class Map.
+     * @description This test tests the behaviour of put() method when is called on a Map using as parameter a null reference (NullPointerException expected)
+     * @expectedResults The map is expected to throw a NullPointerException.
+     * @actualResult As expected result.
+     * @dependencies  This test doesn't depend on the correctness of any other method of the class.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance doesn't have to be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testPut_exception3() {
+        instance.put(null, null);
     }
     
     /**
@@ -695,12 +1377,9 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance has to be modified by the operations perfomed on it.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testPutAll_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.putAll(null);
-                });
+        instance.putAll(null);
     }
 
     /**
@@ -777,12 +1456,9 @@ public class MapTest {
      * @preConditions The map instance must be a new istance of Map.
      * @postConditions The map instance is not modified as direct result of the test of the method.
      */
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testRemove_exceptions() {
-        assertThrows("si usa come parametro un riferimento a null", NullPointerException.class,
-                () -> {
-                    instance.remove(null);
-                });
+        instance.remove(null);
     }
 
     /**
@@ -817,12 +1493,345 @@ public class MapTest {
     }    
 
     /**
-     * @title Test of values method, of class Map.
+     * @title Test #1 of values method, of class Map.
+     * @description This test tests the behaviour of values() method when called on an empty map.
+     * @expectedResults The collection is expected to be empty.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method isEmpty.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
      */
     @Test
-    public void testValues() {
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testValues_empty() {
+        HCollection values = instance.values();
+        assertEquals("una mappa vuota non ha valori", true, values.isEmpty());
+    }
+    
+    /**
+     * @title Test #2 of values method, of class Map.
+     * @description This test tests the behaviour of values() method when called on a not-empty map.
+     * @expectedResults The collection size is expected to equals to the number of entries previously putted in the map. The collection is also expected to contain all the values contained by the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods put, isEmpty and contains.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testValues_notEmpty() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "asso");
+        HCollection values = instance.values();
+        assertEquals("la dimensione della collezione deve equivalere al numero di entry inserite", 2, values.size());
+        assertEquals("la collezione deve contenere effettivamente i valori", true, values.contains("pluto")&&values.contains("asso"));
+    }
+    
+    /**
+     * @title Test #3 of values method, of class Map.
+     * @description This test tests the behaviour of values() method when called on a not-empty map which contains duplicate values.
+     * @expectedResults The collection size is expected to equals to the number of entries previously putted in the map (duplicates must be contained twice in the resulting collection).
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of methods size and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method.
+     */
+    @Test
+    public void testValues_duplicates() {
+        instance.put("pippo", "pluto");
+        instance.put("masso", "pluto");
+        instance.put("basso", "pippo");
+        HCollection values = instance.values();
+        assertEquals("la dimensione della collezione deve equivalere al numero di entry inserite", 3, values.size());
+    }
+    
+    /**
+     * @title Test #4 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, this test that the new collection is backed to the map and that, if a structural modification is performed in the collection, it is reflected in the map too.
+     * @expectedResults The iterator must be able to iterate all the map, and the changes performed by the iterator must be reflected to the main map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, isEmpty, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testValues_backed() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        HCollection values = instance.values();
+        values.remove("pluto");
+        assertEquals("la collezione riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("pluto"));
+        HCollection param = new List();
+        param.add("topolino");
+        param.add("pippo");
+        values.removeAll(param);
+        assertEquals("la collezione riflette la rimozione sulla mappa", 1, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("topolino"));
+        values.retainAll(param);
+        assertEquals("la collezione riflette la rimozione sulla mappa", true, instance.isEmpty());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue("asso"));
+    }
+    
+    /**
+     * @title Test #5 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the iterator of the collection of values returned.
+     * @expectedResults The iterator must be capable of iterating all map values and the modifications performed by the iterator should be reflected to the main list.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method size, containsValue and put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method.
+     */
+    @Test
+    public void testValues_iterator() {
+        HIterator it = instance.values().iterator();
+        assertEquals("l'iteratore dei valori di una mappa vuota non deve avere next", false, it.hasNext());
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("masso", "asso");
+        it = instance.values().iterator();
+        int i = 0;
+        Object second = null;
+        while(it.hasNext()){
+            if(i==1) {
+                second = it.next();
+                assertEquals("l'elemento restituito dall'iteratore è contenuto nella mappa", true, instance.containsValue(second));
+            } else {
+                assertEquals("l'elemento restituito dall'iteratore è contenuto nella mappa", true, instance.containsValue(it.next()));
+            }
+            i++;
+            
+        }
+        it = instance.values().iterator();
+        Object removed = it.next();
+        it.remove();
+        assertEquals("la collezione riflette la rimozione sulla mappa", 2, instance.size());
+        assertEquals("l'elemento rimosso non è più contenuto", false, instance.containsValue(removed));
+        assertEquals("elemento successivo coerente", second, it.next()); 
+    }
+    
+    /**
+     * @title Test #6 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it test hashCode and equals method of the returned collection.
+     * @expectedResults Two values set should equals when one of them contains all the elements of the other. hashcode and equals should be coherents.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testValues_equalsHash() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        Map other = new Map();
+        other.put("argo", "pluto");
+        other.put("paperino", "topolino");
+        assertEquals("dovrebbero equivalere", true, instance.values().equals(other.values()));
+        assertEquals("stessi hash", true, instance.values().hashCode()==other.values().hashCode());
+        instance.put("asso", "bello");
+        assertEquals("non dovrebbero equivalere", false, instance.values().equals(other.values()));
+        assertEquals("non dovrebbero avere gli stessi hash", false, instance.values().hashCode()==other.values().hashCode());
+    }
+    
+    /**
+     * @title Test #7 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests clear method of the returned collection.
+     * @expectedResults The clear method should delete all the entries of the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should be modified by the execution of the method tested.
+     */
+    @Test
+    public void testValues_clear() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HCollection values = instance.values();
+        values.clear();
+        assertEquals("la mappa dovrebbe essere vuota", true, instance.isEmpty());
+        assertEquals("la collezione deve essere vuota", true, values.isEmpty());
+    }
+    
+    /**
+     * @title Test #8 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests containsAll method of the returned collection.
+     * @expectedResults The method should correctly verify if a collection of values is contained or not in the map.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method depends on the correctness of method put.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test
+    public void testValues_containsAll() {
+        instance.put("pippo", "pluto");
+        instance.put("paperino", "topolino");
+        instance.put("asso", "bello");
+        HCollection param = new List();
+        param.add("pluto");
+        param.add("masso");
+        HCollection values = instance.values();
+        assertEquals("non tutti i valori sono contenuti", false, values.containsAll(param));
+        param.remove("masso");
+        param.add("topolino");
+        assertEquals("tutti i valori sono contenuti", true, values.containsAll(param));
+    }
+    
+    /**
+     * @title Test #9 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testValues_exception1() {
+        instance.values().add("pippo");
+    }
+    
+    /**
+     * @title Test #10 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = UnsupportedOperationException.class)
+    public void testValues_exception2() {
+        instance.values().addAll(new List());
+    }
+    
+    /**
+     * @title Test #11 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception3() {
+        instance.values().containsAll(null);
+    }
+    
+    /**
+     * @title Test #12 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception4() {
+        instance.values().contains(null);
+    }
+    
+    /**
+     * @title Test #13 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception5() {
+        instance.values().remove(null);
+    }
+    
+    /**
+     * @title Test #14 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception6() {
+        instance.values().removeAll(null);
+    }
+    
+    /**
+     * @title Test #15 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception7() {
+        instance.values().retainAll(null);
+    }
+    
+    /**
+     * @title Test #16 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NullPointerException.class)
+    public void testValues_exception8() {
+        instance.values().toArray(null);
+    }
+    
+    /**
+     * @title Test #17 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = NoSuchElementException.class)
+    public void testValues_exception9() {
+        instance.values().iterator().next();
+    }
+    
+    /**
+     * @title Test #18 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testValues_exception10() {
+        instance.values().iterator().remove();
+    }
+    
+    /**
+     * @title Test #19 of values method, of class Map.
+     * @description This test tests the behaviour of values() method. More in details, it tests the returned set throws the right exceptions when expected.
+     * @expectedResults The method should correctly throw all the exceptions documented.
+     * @actualResult As expected result.
+     * @dependencies The correctness of this method does not depends on the correctness of other methods.
+     * @preConditions The map instance must be a new istance of Map.
+     * @postConditions The map instance should not be modified by the execution of the method tested.
+     */
+    @Test(expected = exceptions.IllegalStateException.class)
+    public void testValues_exception11() {
+        instance.put("pippo", "pluto");
+        HIterator it = instance.values().iterator();
+        it.next();
+        it.remove();
+        it.remove();
     }
     
 }
